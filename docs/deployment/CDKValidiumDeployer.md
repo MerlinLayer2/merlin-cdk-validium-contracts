@@ -1,4 +1,4 @@
-Contract responsible for deploying deterministic address contracts related with the Supernets2
+Contract responsible for deploying deterministic address contracts related with the CDKValidium
 
 
 ## Functions
