@@ -2,6 +2,7 @@
 /* eslint-disable no-console, no-inner-declarations, no-undef, import/no-unresolved */
 const { expect } = require('chai');
 const { ethers } = require('hardhat');
+const hre = require('hardhat');
 
 const gasPriceKeylessDeployment = '100'; // 100 gweis
 
@@ -12,8 +13,17 @@ async function deployCDKValidiumDeployer(deployerAddress, signer) {
         deployerAddress,
     )).data;
 
+    let maxFeePerGas;
+    if (process.env.CUSTOMIZE_GAS === undefined || process.env.CUSTOMIZE_GAS === 'false') {
+        const feeData = await ethers.provider.getFeeData();
+        maxFeePerGas = feeData.maxFeePerGas;
+    } else {
+        maxFeePerGas = ethers.utils.parseUnits(process.env.MAX_FEE_PER_GAS, 'gwei');
+    }
     const gasLimit = ethers.BigNumber.from(1000000); // Put 1 Million, aprox 650k are necessary
-    const gasPrice = ethers.BigNumber.from(ethers.utils.parseUnits(gasPriceKeylessDeployment, 'gwei'));
+    const gasPrice = hre.network.name === 'hardhat'
+        ? ethers.BigNumber.from(ethers.utils.parseUnits(gasPriceKeylessDeployment, 'gwei'))
+        : maxFeePerGas;
     const to = '0x'; // bc deployment transaction, "to" is "0x"
     const tx = {
         to,
@@ -23,6 +33,9 @@ async function deployCDKValidiumDeployer(deployerAddress, signer) {
         gasPrice: gasPrice.toHexString(),
         data: deployTxCDKValidiumDeployer,
     };
+    if (!(hre.network.name === 'hardhat')) {
+        tx.chainId = signer.provider.network.chainId;
+    }
 
     const signature = {
         v: 27,

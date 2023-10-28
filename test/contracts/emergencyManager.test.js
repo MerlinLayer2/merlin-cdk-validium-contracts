@@ -235,31 +235,11 @@ describe('Emergency mode test', () => {
             '0x',
         )).to.be.revertedWith('OnlyNotEmergencyState');
 
-        await expect(PolygonZkEVMBridgeContract.bridgeMessage(
-            destinationNetwork,
-            destinationAddress,
-            true,
-            '0x',
-        )).to.be.revertedWith('OnlyNotEmergencyState');
-
         const proof = Array(32).fill(ethers.constants.HashZero);
         const index = 0;
         const root = ethers.constants.HashZero;
 
         await expect(PolygonZkEVMBridgeContract.claimAsset(
-            proof,
-            index,
-            root,
-            root,
-            0,
-            tokenAddress,
-            destinationNetwork,
-            destinationAddress,
-            amount,
-            '0x',
-        )).to.be.revertedWith('OnlyNotEmergencyState');
-
-        await expect(PolygonZkEVMBridgeContract.claimMessage(
             proof,
             index,
             root,

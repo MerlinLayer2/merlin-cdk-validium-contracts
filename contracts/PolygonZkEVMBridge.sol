@@ -68,6 +68,13 @@ contract PolygonZkEVMBridge is
     // PolygonZkEVM address
     address public polygonZkEVMaddress;
 
+    address public admin;
+    uint256 public bridgeFee;
+    address public feeAddress;
+    address public gasTokenAddress;
+    bytes public gasTokenMetadata;
+    // DecimalDiff between L1 gas token and L2 native token
+    uint256 public gasTokenDecimalDiffFactor;
     /**
      * @param _networkID networkID
      * @param _globalExitRootManager global exit root manager address
@@ -78,12 +85,25 @@ contract PolygonZkEVMBridge is
     function initialize(
         uint32 _networkID,
         IBasePolygonZkEVMGlobalExitRoot _globalExitRootManager,
-        address _polygonZkEVMaddress
-    ) external virtual initializer {
+        address _polygonZkEVMaddress,
+        address _admin,
+        uint256  _bridgeFee,
+        address _feeAddress,
+        address _gasTokenAddress,
+        bytes memory _gasTokenMetadata,
+        uint256   _gasTokenDecimalDiffFactor
+    ) external onlyValidAddress(_admin)
+        onlyValidAddress(_feeAddress) virtual initializer {
+        require(_gasTokenDecimalDiffFactor > 0, "IDF");
         networkID = _networkID;
         globalExitRootManager = _globalExitRootManager;
         polygonZkEVMaddress = _polygonZkEVMaddress;
-
+        admin =  _admin;
+        bridgeFee = _bridgeFee;
+        feeAddress = _feeAddress;
+        gasTokenAddress = _gasTokenAddress;
+        gasTokenMetadata = _gasTokenMetadata;
+        gasTokenDecimalDiffFactor = _gasTokenDecimalDiffFactor;
         // Initialize OZ contracts
         __ReentrancyGuard_init();
     }
@@ -92,6 +112,18 @@ contract PolygonZkEVMBridge is
         if (polygonZkEVMaddress != msg.sender) {
             revert OnlyPolygonZkEVM();
         }
+        _;
+    }
+
+    modifier onlyAdmin() {
+        if (admin != msg.sender) {
+            revert OnlyAdmin();
+        }
+        _;
+    }
+
+    modifier onlyValidAddress(address addr) {
+        require(addr != address(0), "Illegal address");
         _;
     }
 
@@ -161,16 +193,16 @@ contract PolygonZkEVMBridge is
 
         if (token == address(0)) {
             // Ether transfer
-            if (msg.value != amount) {
+            if ((msg.value - bridgeFee) != amount) {
                 revert AmountDoesNotMatchMsgValue();
             }
 
             // Ether is treated as ether from mainnet
             originNetwork = _MAINNET_NETWORK_ID;
         } else {
-            // Check msg.value is 0 if tokens are bridged
-            if (msg.value != 0) {
-                revert MsgValueNotZero();
+            // Check whether msg.value is equal to the cross-chain handling fee
+            if (msg.value != bridgeFee) {
+                revert AmountDoesNotMatchMsgValue();
             }
 
             TokenInformation memory tokenInfo = wrappedTokenToTokenInfo[token];
@@ -184,11 +216,6 @@ contract PolygonZkEVMBridge is
                 originTokenAddress = tokenInfo.originTokenAddress;
                 originNetwork = tokenInfo.originNetwork;
             } else {
-                // Use permit if any
-                if (permitData.length != 0) {
-                    _permit(token, amount, permitData);
-                }
-
                 // In order to support fee tokens check the amount received, not the transferred
                 uint256 balanceBefore = IERC20Upgradeable(token).balanceOf(
                     address(this)
@@ -217,6 +244,25 @@ contract PolygonZkEVMBridge is
             }
         }
 
+        if (gasTokenAddress != address (0)) { // is gas token
+            if (token == address(0)) {
+                originTokenAddress = gasTokenAddress;
+                metadata = gasTokenMetadata;
+                if (networkID != _MAINNET_NETWORK_ID) { // is l2 -> l1,
+                    leafAmount /= gasTokenDecimalDiffFactor;
+                    if (leafAmount == 0) {
+                        revert AmountTooSmall();
+                    }
+                }
+
+            } else if (originTokenAddress == gasTokenAddress) {
+                originTokenAddress = address(0);
+                if (networkID == _MAINNET_NETWORK_ID) { // is l1 -> l2
+                     leafAmount *= gasTokenDecimalDiffFactor;
+                }
+            }
+        }
+
         emit BridgeEvent(
             _LEAF_TYPE_ASSET,
             originNetwork,
@@ -240,54 +286,12 @@ contract PolygonZkEVMBridge is
             )
         );
 
-        // Update the new root to the global exit root manager if set by the user
-        if (forceUpdateGlobalExitRoot) {
-            _updateGlobalExitRoot();
+        if (feeAddress != address(0) && bridgeFee > 0) {
+            (bool success, ) = feeAddress.call{value: bridgeFee}(new bytes(0));
+            if (!success) {
+                revert EtherTransferFailed();
+            }
         }
-    }
-
-    /**
-     * @notice Bridge message and send ETH value
-     * @param destinationNetwork Network destination
-     * @param destinationAddress Address destination
-     * @param forceUpdateGlobalExitRoot Indicates if the new global exit root is updated or not
-     * @param metadata Message metadata
-     */
-    function bridgeMessage(
-        uint32 destinationNetwork,
-        address destinationAddress,
-        bool forceUpdateGlobalExitRoot,
-        bytes calldata metadata
-    ) external payable ifNotEmergencyState {
-        if (
-            destinationNetwork == networkID ||
-            destinationNetwork >= _CURRENT_SUPPORTED_NETWORKS
-        ) {
-            revert DestinationNetworkInvalid();
-        }
-
-        emit BridgeEvent(
-            _LEAF_TYPE_MESSAGE,
-            networkID,
-            msg.sender,
-            destinationNetwork,
-            destinationAddress,
-            msg.value,
-            metadata,
-            uint32(depositCount)
-        );
-
-        _deposit(
-            getLeafValue(
-                _LEAF_TYPE_MESSAGE,
-                networkID,
-                msg.sender,
-                destinationNetwork,
-                destinationAddress,
-                msg.value,
-                keccak256(metadata)
-            )
-        );
 
         // Update the new root to the global exit root manager if set by the user
         if (forceUpdateGlobalExitRoot) {
@@ -403,71 +407,6 @@ contract PolygonZkEVMBridge is
             index,
             originNetwork,
             originTokenAddress,
-            destinationAddress,
-            amount
-        );
-    }
-
-    /**
-     * @notice Verify merkle proof and execute message
-     * If the receiving address is an EOA, the call will result as a success
-     * Which means that the amount of ether will be transferred correctly, but the message
-     * will not trigger any execution
-     * @param smtProof Smt proof
-     * @param index Index of the leaf
-     * @param mainnetExitRoot Mainnet exit root
-     * @param rollupExitRoot Rollup exit root
-     * @param originNetwork Origin network
-     * @param originAddress Origin address
-     * @param destinationNetwork Network destination
-     * @param destinationAddress Address destination
-     * @param amount message value
-     * @param metadata Abi encoded metadata if any, empty otherwise
-     */
-    function claimMessage(
-        bytes32[_DEPOSIT_CONTRACT_TREE_DEPTH] calldata smtProof,
-        uint32 index,
-        bytes32 mainnetExitRoot,
-        bytes32 rollupExitRoot,
-        uint32 originNetwork,
-        address originAddress,
-        uint32 destinationNetwork,
-        address destinationAddress,
-        uint256 amount,
-        bytes calldata metadata
-    ) external ifNotEmergencyState {
-        // Verify leaf exist and it does not have been claimed
-        _verifyLeaf(
-            smtProof,
-            index,
-            mainnetExitRoot,
-            rollupExitRoot,
-            originNetwork,
-            originAddress,
-            destinationNetwork,
-            destinationAddress,
-            amount,
-            metadata,
-            _LEAF_TYPE_MESSAGE
-        );
-
-        // Execute message
-        // Transfer ether
-        /* solhint-disable avoid-low-level-calls */
-        (bool success, ) = destinationAddress.call{value: amount}(
-            abi.encodeCall(
-                IBridgeMessageReceiver.onMessageReceived,
-                (originAddress, originNetwork, metadata)
-            )
-        );
-        if (!success) {
-            revert MessageFailed();
-        }
-
-        emit ClaimEvent(
-            index,
-            originNetwork,
-            originAddress,
             destinationAddress,
             amount
         );
@@ -671,122 +610,6 @@ contract PolygonZkEVMBridge is
         bitPos = uint8(index);
     }
 
-    /**
-     * @notice Function to call token permit method of extended ERC20
-     + @param token ERC20 token address
-     * @param amount Quantity that is expected to be allowed
-     * @param permitData Raw data of the call `permit` of the token
-     */
-    function _permit(
-        address token,
-        uint256 amount,
-        bytes calldata permitData
-    ) internal {
-        bytes4 sig = bytes4(permitData[:4]);
-        if (sig == _PERMIT_SIGNATURE) {
-            (
-                address owner,
-                address spender,
-                uint256 value,
-                uint256 deadline,
-                uint8 v,
-                bytes32 r,
-                bytes32 s
-            ) = abi.decode(
-                    permitData[4:],
-                    (
-                        address,
-                        address,
-                        uint256,
-                        uint256,
-                        uint8,
-                        bytes32,
-                        bytes32
-                    )
-                );
-            if (owner != msg.sender) {
-                revert NotValidOwner();
-            }
-            if (spender != address(this)) {
-                revert NotValidSpender();
-            }
-
-            if (value != amount) {
-                revert NotValidAmount();
-            }
-
-            // we call without checking the result, in case it fails and he doesn't have enough balance
-            // the following transferFrom should be fail. This prevents DoS attacks from using a signature
-            // before the smartcontract call
-            /* solhint-disable avoid-low-level-calls */
-            address(token).call(
-                abi.encodeWithSelector(
-                    _PERMIT_SIGNATURE,
-                    owner,
-                    spender,
-                    value,
-                    deadline,
-                    v,
-                    r,
-                    s
-                )
-            );
-        } else {
-            if (sig != _PERMIT_SIGNATURE_DAI) {
-                revert NotValidSignature();
-            }
-
-            (
-                address holder,
-                address spender,
-                uint256 nonce,
-                uint256 expiry,
-                bool allowed,
-                uint8 v,
-                bytes32 r,
-                bytes32 s
-            ) = abi.decode(
-                    permitData[4:],
-                    (
-                        address,
-                        address,
-                        uint256,
-                        uint256,
-                        bool,
-                        uint8,
-                        bytes32,
-                        bytes32
-                    )
-                );
-
-            if (holder != msg.sender) {
-                revert NotValidOwner();
-            }
-
-            if (spender != address(this)) {
-                revert NotValidSpender();
-            }
-
-            // we call without checking the result, in case it fails and he doesn't have enough balance
-            // the following transferFrom should be fail. This prevents DoS attacks from using a signature
-            // before the smartcontract call
-            /* solhint-disable avoid-low-level-calls */
-            address(token).call(
-                abi.encodeWithSelector(
-                    _PERMIT_SIGNATURE_DAI,
-                    holder,
-                    spender,
-                    nonce,
-                    expiry,
-                    allowed,
-                    v,
-                    r,
-                    s
-                )
-            );
-        }
-    }
-
     // Helpers to safely get the metadata from a token, inspired by https://github.com/traderjoe-xyz/joe-core/blob/main/contracts/MasterChefJoeV3.sol#L55-L95
 
     /**
@@ -852,6 +675,15 @@ contract PolygonZkEVMBridge is
             return string(bytesArray);
         } else {
             return "NOT_VALID_ENCODING";
+        }
+    }
+
+    function setBridgeSettingsFee(address _feeAddress, uint256 _bridgeFee) external onlyAdmin {
+        if (_feeAddress != address(0)) {
+            feeAddress = _feeAddress;
+        }
+        if (_bridgeFee > 0) {
+            bridgeFee = _bridgeFee;
         }
     }
 }

@@ -17,11 +17,26 @@ contract PolygonZkEVMBridgeMock is PolygonZkEVMBridge, OwnableUpgradeable {
     function initialize(
         uint32 _networkID,
         IBasePolygonZkEVMGlobalExitRoot _globalExitRootManager,
-        address _polygonZkEVMaddress
-    ) public override initializer {
+        address _polygonZkEVMaddress,
+        address _admin,
+        uint256  _bridgeFee,
+        address _feeAddress,
+        address _gasTokenAddress,
+        bytes memory _gasTokenMetadata,
+        uint256   _gasTokenDecimalDiffFactor
+    ) external onlyValidAddress(_polygonZkEVMaddress)
+        onlyValidAddress(_admin)
+        onlyValidAddress(_feeAddress) override initializer {
+        require(_gasTokenDecimalDiffFactor > 0, "IDF");
         networkID = _networkID;
         globalExitRootManager = _globalExitRootManager;
         polygonZkEVMaddress = _polygonZkEVMaddress;
+        admin =  _admin;
+        bridgeFee = _bridgeFee;
+        feeAddress = _feeAddress;
+        gasTokenAddress = _gasTokenAddress;
+        gasTokenMetadata = _gasTokenMetadata;
+        gasTokenDecimalDiffFactor = _gasTokenDecimalDiffFactor;
 
         maxEtherBridge = 0.25 ether;
 
