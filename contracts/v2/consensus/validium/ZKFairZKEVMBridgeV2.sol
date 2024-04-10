@@ -1,0 +1,771 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+pragma solidity 0.8.20;
+
+import "../../lib/DepositContractV2.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
+import "../../../lib/TokenWrapped.sol";
+import "../../../interfaces/IBasePolygonZkEVMGlobalExitRoot.sol";
+import "../../../interfaces/IBridgeMessageReceiver.sol";
+import "../../interfaces/IZKFairZkEVMBridgeV2.sol";
+import "../../../lib/EmergencyManager.sol";
+import "../../../lib/GlobalExitRootLib.sol";
+
+/**
+ * PolygonZkEVMBridge that will be deployed on Ethereum and all Polygon rollups
+ * Contract responsible to manage the token interactions with other networks
+ */
+contract ZKFairZkEVMBridgeV2 is
+    DepositContractV2,
+    EmergencyManager,
+    IZKFairZkEVMBridgeV2
+{
+    using SafeERC20Upgradeable for IERC20Upgradeable;
+
+    // Wrapped Token information struct
+    struct TokenInformation {
+        uint32 originNetwork;
+        address originTokenAddress;
+    }
+
+    // bytes4(keccak256(bytes("permit(address,address,uint256,uint256,uint8,bytes32,bytes32)")));
+    bytes4 private constant _PERMIT_SIGNATURE = 0xd505accf;
+
+    // bytes4(keccak256(bytes("permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)")));
+    bytes4 private constant _PERMIT_SIGNATURE_DAI = 0x8fcbaf0c;
+
+    // Mainnet identifier
+    uint32 private constant _MAINNET_NETWORK_ID = 0;
+
+    // Number of networks supported by the bridge
+    uint32 private constant _CURRENT_SUPPORTED_NETWORKS = 2;
+
+    // ZkEVM identifier
+    uint32 private constant _ZKEVM_NETWORK_ID = 1;
+
+    // Leaf type asset
+    uint8 private constant _LEAF_TYPE_ASSET = 0;
+
+    // Leaf type message
+    uint8 private constant _LEAF_TYPE_MESSAGE = 1;
+
+    // Nullifier offset
+    uint256 private constant _MAX_LEAFS_PER_NETWORK = 2 ** 32;
+
+    // Indicate where's the mainnet flag bit in the global index
+    uint256 private constant _GLOBAL_INDEX_MAINNET_FLAG = 2 ** 64;
+
+    // Network identifier
+    uint32 public networkID;
+
+    // Global Exit Root address
+    IBasePolygonZkEVMGlobalExitRoot public globalExitRootManager;
+
+    // Last updated deposit count to the global exit root manager
+    uint32 public lastUpdatedDepositCount;
+
+    // Leaf index --> claimed bit map
+    mapping(uint256 => uint256) public claimedBitMap;
+
+    // keccak256(OriginNetwork || tokenAddress) --> Wrapped token address
+    mapping(bytes32 => address) public tokenInfoToWrappedToken;
+
+    // Wrapped token Address --> Origin token information
+    mapping(address => TokenInformation) public wrappedTokenToTokenInfo;
+
+    // Rollup manager address, previously PolygonZkEVM
+    /// @custom:oz-renamed-from polygonZkEVMaddress
+    address public polygonRollupManager;
+
+    address public admin;
+    uint256 public bridgeFee;
+    address public feeAddress;
+    address public gasTokenAddress;
+    bytes public gasTokenMetadata;
+    // DecimalDiff between L1 gas token and L2 native token
+    uint256 public gasTokenDecimalDiffFactor;
+
+    /**
+    * Disable initalizers on the implementation following the best practices
+    */
+    constructor() {
+        _disableInitializers();
+    }
+
+    /**
+     * @param _networkID networkID
+     * @param _globalExitRootManager global exit root manager address
+     * @param _polygonRollupManager polygonZkEVM address
+     * @notice The value of `_polygonZkEVMaddress` on the L2 deployment of the contract will be address(0), so
+     * emergency state is not possible for the L2 deployment of the bridge, intentionally
+     */
+    function initialize(
+        uint32 _networkID,
+        IBasePolygonZkEVMGlobalExitRoot _globalExitRootManager,
+        address _polygonRollupManager,
+        address _admin,
+        uint256  _bridgeFee,
+        address _feeAddress,
+        address _gasTokenAddress,
+        bytes memory _gasTokenMetadata,
+        uint256   _gasTokenDecimalDiffFactor
+    ) external onlyValidAddress(_polygonRollupManager)
+    onlyValidAddress(_admin)
+    onlyValidAddress(_feeAddress) virtual initializer {
+        require(_gasTokenDecimalDiffFactor > 0, "IDF");
+        networkID = _networkID;
+        globalExitRootManager = _globalExitRootManager;
+        polygonRollupManager = _polygonRollupManager;
+        admin =  _admin;
+        bridgeFee = _bridgeFee;
+        feeAddress = _feeAddress;
+        gasTokenAddress = _gasTokenAddress;
+        gasTokenMetadata = _gasTokenMetadata;
+        gasTokenDecimalDiffFactor = _gasTokenDecimalDiffFactor;
+        // Initialize OZ contracts
+        __ReentrancyGuard_init();
+    }
+
+    modifier onlyRollupManager() {
+        if (polygonRollupManager != msg.sender) {
+            revert OnlyRollupManager();
+        }
+        _;
+    }
+
+    modifier onlyAdmin() {
+        if (admin != msg.sender) {
+            revert OnlyAdmin();
+        }
+        _;
+    }
+
+    modifier onlyValidAddress(address addr) {
+        require(addr != address(0), "Illegal address");
+        _;
+    }
+
+    /**
+     * @dev Emitted when bridge assets or messages to another network
+     */
+    event BridgeEvent(
+        uint8 leafType,
+        uint32 originNetwork,
+        address originAddress,
+        uint32 destinationNetwork,
+        address destinationAddress,
+        uint256 amount,
+        bytes metadata,
+        uint32 depositCount
+    );
+
+    /**
+     * @dev Emitted when a claim is done from another network
+     */
+    event ClaimEvent(
+        uint256 globalIndex,
+        uint32 originNetwork,
+        address originAddress,
+        address destinationAddress,
+        uint256 amount
+    );
+
+    /**
+     * @dev Emitted when a new wrapped token is created
+     */
+    event NewWrappedToken(
+        uint32 originNetwork,
+        address originTokenAddress,
+        address wrappedTokenAddress,
+        bytes metadata
+    );
+
+    /**
+     * @notice Deposit add a new leaf to the merkle tree
+     * @param destinationNetwork Network destination
+     * @param destinationAddress Address destination
+     * @param amount Amount of tokens
+     * @param token Token address, 0 address is reserved for ether
+     * @param forceUpdateGlobalExitRoot Indicates if the new global exit root is updated or not
+     * @param permitData Raw data of the call `permit` of the token
+     */
+    function bridgeAsset(
+        uint32 destinationNetwork,
+        address destinationAddress,
+        uint256 amount,
+        address token,
+        bool forceUpdateGlobalExitRoot,
+        bytes calldata permitData
+    ) public payable virtual ifNotEmergencyState nonReentrant {
+        if (
+            destinationNetwork == networkID ||
+            destinationNetwork >= _CURRENT_SUPPORTED_NETWORKS
+        ) {
+            revert DestinationNetworkInvalid();
+        }
+
+        address originTokenAddress;
+        uint32 originNetwork;
+        bytes memory metadata;
+        uint256 leafAmount = amount;
+
+        if (token == address(0)) {
+            // Ether transfer
+            if ((msg.value - bridgeFee) != amount) {
+                revert AmountDoesNotMatchMsgValue();
+            }
+
+            // Ether is treated as ether from mainnet
+            originNetwork = _MAINNET_NETWORK_ID;
+        } else {
+            // Check whether msg.value is equal to the cross-chain handling fee
+            if (msg.value != bridgeFee) {
+                revert AmountDoesNotMatchMsgValue();
+            }
+
+            TokenInformation memory tokenInfo = wrappedTokenToTokenInfo[token];
+
+            if (tokenInfo.originTokenAddress != address(0)) {
+                // The token is a wrapped token from another network
+
+                // Burn tokens
+                TokenWrapped(token).burn(msg.sender, amount);
+
+                originTokenAddress = tokenInfo.originTokenAddress;
+                originNetwork = tokenInfo.originNetwork;
+            } else {
+                // In order to support fee tokens check the amount received, not the transferred
+                uint256 balanceBefore = IERC20Upgradeable(token).balanceOf(
+                    address(this)
+                );
+                IERC20Upgradeable(token).safeTransferFrom(
+                    msg.sender,
+                    address(this),
+                    amount
+                );
+                uint256 balanceAfter = IERC20Upgradeable(token).balanceOf(
+                    address(this)
+                );
+
+                // Override leafAmount with the received amount
+                leafAmount = balanceAfter - balanceBefore;
+
+                originTokenAddress = token;
+                originNetwork = networkID;
+
+                // Encode metadata
+                metadata = getTokenMetadata(token);
+            }
+        }
+
+        if (gasTokenAddress != address (0)) { // is gas token
+            if (token == address(0)) {
+                originTokenAddress = gasTokenAddress;
+                metadata = gasTokenMetadata;
+                if (networkID != _MAINNET_NETWORK_ID) { // is l2 -> l1,
+                    leafAmount /= gasTokenDecimalDiffFactor;
+                    if (leafAmount == 0) {
+                        revert AmountTooSmall();
+                    }
+                }
+
+            } else if (originTokenAddress == gasTokenAddress) {
+                originTokenAddress = address(0);
+                if (networkID == _MAINNET_NETWORK_ID) { // is l1 -> l2
+                    leafAmount *= gasTokenDecimalDiffFactor;
+                }
+            }
+        }
+
+        emit BridgeEvent(
+            _LEAF_TYPE_ASSET,
+            originNetwork,
+            originTokenAddress,
+            destinationNetwork,
+            destinationAddress,
+            leafAmount,
+            metadata,
+            uint32(depositCount)
+        );
+
+        _addLeaf(
+            getLeafValue(
+                _LEAF_TYPE_ASSET,
+                originNetwork,
+                originTokenAddress,
+                destinationNetwork,
+                destinationAddress,
+                leafAmount,
+                keccak256(metadata)
+            )
+        );
+
+        if (feeAddress != address(0) && bridgeFee > 0) {
+            (bool success, ) = feeAddress.call{value: bridgeFee}(new bytes(0));
+            if (!success) {
+                revert EtherTransferFailed();
+            }
+        }
+
+        // Update the new root to the global exit root manager if set by the user
+        if (forceUpdateGlobalExitRoot) {
+            _updateGlobalExitRoot();
+        }
+    }
+
+    /**
+     * @notice Verify merkle proof and withdraw tokens/ether
+     * @param smtProofLocalExitRoot Smt proof to proof the leaf against the network exit root
+     * @param smtProofRollupExitRoot Smt proof to proof the rollupLocalExitRoot against the rollups exit root
+     * @param globalIndex Global index is defined as:
+     * | 191 bits |    1 bit     |   32 bits   |     32 bits    |
+     * |    0     |  mainnetFlag | rollupIndex | localRootIndex |
+     * note that only the rollup index will be used only in case the mainnet flag is 0
+     * note that global index do not assert the unused bits to 0.
+     * This means that when synching the events, the globalIndex must be decoded the same way that in the Smart contract
+     * to avoid possible synch attacks
+     * @param mainnetExitRoot Mainnet exit root
+     * @param rollupExitRoot Rollup exit root
+     * @param originNetwork Origin network
+     * @param originTokenAddress  Origin token address, 0 address is reserved for ether
+     * @param destinationNetwork Network destination
+     * @param destinationAddress Address destination
+     * @param amount Amount of tokens
+     * @param metadata Abi encoded metadata if any, empty otherwise
+     */
+    function claimAsset(
+        bytes32[_DEPOSIT_CONTRACT_TREE_DEPTH] calldata smtProofLocalExitRoot,
+        bytes32[_DEPOSIT_CONTRACT_TREE_DEPTH] calldata smtProofRollupExitRoot,
+        uint256 globalIndex,
+        bytes32 mainnetExitRoot,
+        bytes32 rollupExitRoot,
+        uint32 originNetwork,
+        address originTokenAddress,
+        uint32 destinationNetwork,
+        address destinationAddress,
+        uint256 amount,
+        bytes calldata metadata
+    ) external ifNotEmergencyState {
+        // Destination network must be this networkID
+        if (destinationNetwork != networkID) {
+            revert DestinationNetworkInvalid();
+        }
+
+        // Verify leaf exist and it does not have been claimed
+        _verifyLeaf(
+            smtProofLocalExitRoot,
+            smtProofRollupExitRoot,
+            globalIndex,
+            mainnetExitRoot,
+            rollupExitRoot,
+            getLeafValue(
+                _LEAF_TYPE_ASSET,
+                originNetwork,
+                originTokenAddress,
+                destinationNetwork,
+                destinationAddress,
+                amount,
+                keccak256(metadata)
+            )
+        );
+
+        // Transfer funds
+        if (originTokenAddress == address(0)) {
+            // Transfer ether
+            /* solhint-disable avoid-low-level-calls */
+            (bool success, ) = destinationAddress.call{value: amount}(
+                new bytes(0)
+            );
+            if (!success) {
+                revert EtherTransferFailed();
+            }
+        } else {
+            // Transfer tokens
+            if (originNetwork == networkID) {
+                // The token is an ERC20 from this network
+                IERC20Upgradeable(originTokenAddress).safeTransfer(
+                    destinationAddress,
+                    amount
+                );
+            } else {
+                // The tokens is not from this network
+                // Create a wrapper for the token if not exist yet
+                bytes32 tokenInfoHash = keccak256(
+                    abi.encodePacked(originNetwork, originTokenAddress)
+                );
+                address wrappedToken = tokenInfoToWrappedToken[tokenInfoHash];
+
+                if (wrappedToken == address(0)) {
+                    // Get ERC20 metadata
+                    (
+                    string memory name,
+                    string memory symbol,
+                    uint8 decimals
+                    ) = abi.decode(metadata, (string, string, uint8));
+
+                    // Create a new wrapped erc20 using create2
+                    TokenWrapped newWrappedToken = (new TokenWrapped){
+                    salt: tokenInfoHash
+                    }(name, symbol, decimals);
+
+                    // Mint tokens for the destination address
+                    newWrappedToken.mint(destinationAddress, amount);
+
+                    // Create mappings
+                    tokenInfoToWrappedToken[tokenInfoHash] = address(
+                        newWrappedToken
+                    );
+
+                    wrappedTokenToTokenInfo[
+                    address(newWrappedToken)
+                    ] = TokenInformation(originNetwork, originTokenAddress);
+
+                    emit NewWrappedToken(
+                        originNetwork,
+                        originTokenAddress,
+                        address(newWrappedToken),
+                        metadata
+                    );
+                } else {
+                    // Use the existing wrapped erc20
+                    TokenWrapped(wrappedToken).mint(destinationAddress, amount);
+                }
+            }
+        }
+
+        emit ClaimEvent(
+            globalIndex,
+            originNetwork,
+            originTokenAddress,
+            destinationAddress,
+            amount
+        );
+    }
+
+    /**
+     * @notice Returns the precalculated address of a wrapper using the token information
+     * Note Updating the metadata of a token is not supported.
+     * Since the metadata has relevance in the address deployed, this function will not return a valid
+     * wrapped address if the metadata provided is not the original one.
+     * @param originNetwork Origin network
+     * @param originTokenAddress Origin token address, 0 address is reserved for ether
+     * @param name Name of the token
+     * @param symbol Symbol of the token
+     * @param decimals Decimals of the token
+     */
+    function precalculatedWrapperAddress(
+        uint32 originNetwork,
+        address originTokenAddress,
+        string memory name,
+        string memory symbol,
+        uint8 decimals
+    ) external view returns (address) {
+        bytes32 salt = keccak256(
+            abi.encodePacked(originNetwork, originTokenAddress)
+        );
+
+        bytes32 hashCreate2 = keccak256(
+            abi.encodePacked(
+                bytes1(0xff),
+                address(this),
+                salt,
+                keccak256(
+                    abi.encodePacked(
+                        type(TokenWrapped).creationCode,
+                        abi.encode(name, symbol, decimals)
+                    )
+                )
+            )
+        );
+
+        // last 20 bytes of hash to address
+        return address(uint160(uint256(hashCreate2)));
+    }
+
+    /**
+     * @notice Returns the address of a wrapper using the token information if already exist
+     * @param originNetwork Origin network
+     * @param originTokenAddress Origin token address, 0 address is reserved for ether
+     */
+    function getTokenWrappedAddress(
+        uint32 originNetwork,
+        address originTokenAddress
+    ) external view returns (address) {
+        return
+        tokenInfoToWrappedToken[
+        keccak256(abi.encodePacked(originNetwork, originTokenAddress))
+        ];
+    }
+
+    /**
+     * @notice Function to activate the emergency state
+     " Only can be called by the Polygon ZK-EVM in extreme situations
+     */
+    function activateEmergencyState() external onlyRollupManager {
+        _activateEmergencyState();
+    }
+
+    /**
+     * @notice Function to deactivate the emergency state
+     " Only can be called by the Polygon ZK-EVM
+     */
+    function deactivateEmergencyState() external onlyRollupManager {
+        _deactivateEmergencyState();
+    }
+
+    /**
+     * @notice Verify leaf and checks that it has not been claimed
+     * @param smtProofLocalExitRoot Smt proof
+     * @param smtProofRollupExitRoot Smt proof
+     * @param globalIndex Index of the leaf
+     * @param mainnetExitRoot Mainnet exit root
+     * @param rollupExitRoot Rollup exit root
+     * @param leafValue leaf value
+     */
+    function _verifyLeaf(
+        bytes32[_DEPOSIT_CONTRACT_TREE_DEPTH] calldata smtProofLocalExitRoot,
+        bytes32[_DEPOSIT_CONTRACT_TREE_DEPTH] calldata smtProofRollupExitRoot,
+        uint256 globalIndex,
+        bytes32 mainnetExitRoot,
+        bytes32 rollupExitRoot,
+        bytes32 leafValue
+    ) internal {
+        // Check blockhash where the global exit root was set
+        // Note that previusly timestamps were setted, since in only checked if != 0 it's ok
+        uint256 blockHashGlobalExitRoot = globalExitRootManager
+        .globalExitRootMap(
+            GlobalExitRootLib.calculateGlobalExitRoot(
+                mainnetExitRoot,
+                rollupExitRoot
+            )
+        );
+
+        if (blockHashGlobalExitRoot == 0) {
+            revert GlobalExitRootInvalid();
+        }
+
+        uint32 leafIndex;
+        uint32 sourceBridgeNetwork;
+
+        // Get origin network from global index
+        if (globalIndex & _GLOBAL_INDEX_MAINNET_FLAG != 0) {
+            // the network is mainnet, therefore sourceBridgeNetwork is 0
+
+            // Last 32 bits are leafIndex
+            leafIndex = uint32(globalIndex);
+
+            if (
+                !verifyMerkleProof(
+                    leafValue,
+                    smtProofLocalExitRoot,
+                    leafIndex,
+                    mainnetExitRoot
+            )
+            ) {
+                revert InvalidSmtProof();
+            }
+        } else {
+            // the network is a rollup, therefore sourceBridgeNetwork must be decoded
+            uint32 indexRollup = uint32(globalIndex >> 32);
+            sourceBridgeNetwork = indexRollup + 1;
+
+            // Last 32 bits are leafIndex
+            leafIndex = uint32(globalIndex);
+
+            // Verify merkle proof agains rollup exit root
+            if (
+                !verifyMerkleProof(
+                    calculateRoot(leafValue, smtProofLocalExitRoot, leafIndex),
+                    smtProofRollupExitRoot,
+                    indexRollup,
+                    rollupExitRoot
+                )
+            ) {
+                revert InvalidSmtProof();
+            }
+        }
+
+        // Set and check nullifier
+        _setAndCheckClaimed(leafIndex, sourceBridgeNetwork);
+    }
+
+    /**
+     * @notice Function to check if an index is claimed or not
+     * @param leafIndex Index
+     * @param sourceBridgeNetwork Origin network
+     */
+    function isClaimed(
+        uint32 leafIndex,
+        uint32 sourceBridgeNetwork
+    ) external view returns (bool) {
+        uint256 globalIndex;
+
+        // For consistency with the previous setted nullifiers
+        if (
+            networkID == _MAINNET_NETWORK_ID &&
+            sourceBridgeNetwork == _ZKEVM_NETWORK_ID
+        ) {
+            globalIndex = uint256(leafIndex);
+        } else {
+            globalIndex =
+                uint256(leafIndex) +
+                uint256(sourceBridgeNetwork) *
+                _MAX_LEAFS_PER_NETWORK;
+        }
+        (uint256 wordPos, uint256 bitPos) = _bitmapPositions(globalIndex);
+        uint256 mask = (1 << bitPos);
+        return (claimedBitMap[wordPos] & mask) == mask;
+    }
+
+    /**
+     * @notice Function to check that an index is not claimed and set it as claimed
+     * @param leafIndex Index
+     * @param sourceBridgeNetwork Origin network
+     */
+    function _setAndCheckClaimed(
+        uint32 leafIndex,
+        uint32 sourceBridgeNetwork
+    ) private {
+        uint256 globalIndex;
+
+        // For consistency with the previous setted nullifiers
+        if (
+            networkID == _MAINNET_NETWORK_ID &&
+            sourceBridgeNetwork == _ZKEVM_NETWORK_ID
+        ) {
+            globalIndex = uint256(leafIndex);
+        } else {
+            globalIndex =
+                uint256(leafIndex) +
+                uint256(sourceBridgeNetwork) *
+                _MAX_LEAFS_PER_NETWORK;
+        }
+        (uint256 wordPos, uint256 bitPos) = _bitmapPositions(globalIndex);
+        uint256 mask = 1 << bitPos;
+        uint256 flipped = claimedBitMap[wordPos] ^= mask;
+        if (flipped & mask == 0) {
+            revert AlreadyClaimed();
+        }
+    }
+
+    /**
+     * @notice Function to update the globalExitRoot if the last deposit is not submitted
+     */
+    function updateGlobalExitRoot() external {
+        if (lastUpdatedDepositCount < depositCount) {
+            _updateGlobalExitRoot();
+        }
+    }
+
+    /**
+     * @notice Function to update the globalExitRoot
+     */
+    function _updateGlobalExitRoot() internal {
+        lastUpdatedDepositCount = uint32(depositCount);
+        globalExitRootManager.updateExitRoot(getRoot());
+    }
+
+    /**
+     * @notice Function decode an index into a wordPos and bitPos
+     * @param index Index
+     */
+    function _bitmapPositions(
+        uint256 index
+    ) private pure returns (uint256 wordPos, uint256 bitPos) {
+        wordPos = uint248(index >> 8);
+        bitPos = uint8(index);
+    }
+
+    // Helpers to safely get the metadata from a token, inspired by https://github.com/traderjoe-xyz/joe-core/blob/main/contracts/MasterChefJoeV3.sol#L55-L95
+
+    /**
+     * @notice Provides a safe ERC20.symbol version which returns 'NO_SYMBOL' as fallback string
+     * @param token The address of the ERC-20 token contract
+     */
+    function _safeSymbol(address token) internal view returns (string memory) {
+        (bool success, bytes memory data) = address(token).staticcall(
+            abi.encodeCall(IERC20MetadataUpgradeable.symbol, ())
+        );
+        return success ? _returnDataToString(data) : "NO_SYMBOL";
+    }
+
+    /**
+     * @notice  Provides a safe ERC20.name version which returns 'NO_NAME' as fallback string.
+     * @param token The address of the ERC-20 token contract.
+     */
+    function _safeName(address token) internal view returns (string memory) {
+        (bool success, bytes memory data) = address(token).staticcall(
+            abi.encodeCall(IERC20MetadataUpgradeable.name, ())
+        );
+        return success ? _returnDataToString(data) : "NO_NAME";
+    }
+
+    /**
+     * @notice Provides a safe ERC20.decimals version which returns '18' as fallback value.
+     * Note Tokens with (decimals > 255) are not supported
+     * @param token The address of the ERC-20 token contract
+     */
+    function _safeDecimals(address token) internal view returns (uint8) {
+        (bool success, bytes memory data) = address(token).staticcall(
+            abi.encodeCall(IERC20MetadataUpgradeable.decimals, ())
+        );
+        return success && data.length == 32 ? abi.decode(data, (uint8)) : 18;
+    }
+
+    /**
+     * @notice Function to convert returned data to string
+     * returns 'NOT_VALID_ENCODING' as fallback value.
+     * @param data returned data
+     */
+    function _returnDataToString(
+        bytes memory data
+    ) internal pure returns (string memory) {
+        if (data.length >= 64) {
+            return abi.decode(data, (string));
+        } else if (data.length == 32) {
+            // Since the strings on bytes32 are encoded left-right, check the first zero in the data
+            uint256 nonZeroBytes;
+            while (nonZeroBytes < 32 && data[nonZeroBytes] != 0) {
+                nonZeroBytes++;
+            }
+
+            // If the first one is 0, we do not handle the encoding
+            if (nonZeroBytes == 0) {
+                return "NOT_VALID_ENCODING";
+            }
+            // Create a byte array with nonZeroBytes length
+            bytes memory bytesArray = new bytes(nonZeroBytes);
+            for (uint256 i = 0; i < nonZeroBytes; i++) {
+                bytesArray[i] = data[i];
+            }
+            return string(bytesArray);
+        } else {
+            return "NOT_VALID_ENCODING";
+        }
+    }
+
+    /**
+     * @notice Returns the encoded token metadata
+     * @param token Address of the token
+     */
+    function getTokenMetadata(
+        address token
+    ) public view returns (bytes memory) {
+        return
+        abi.encode(
+            _safeName(token),
+            _safeSymbol(token),
+            _safeDecimals(token)
+        );
+    }
+
+    function setBridgeSettingsFee(address _feeAddress, uint256 _bridgeFee) external onlyAdmin {
+        if (_feeAddress != address(0)) {
+            feeAddress = _feeAddress;
+        }
+        if (_bridgeFee > 0) {
+            bridgeFee = _bridgeFee;
+        }
+    }
+}
