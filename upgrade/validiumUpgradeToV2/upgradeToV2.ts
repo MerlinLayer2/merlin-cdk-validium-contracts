@@ -7,7 +7,7 @@ import fs = require("fs");
 import * as dotenv from "dotenv";
 dotenv.config({path: path.resolve(__dirname, "../../.env")});
 import {ethers, upgrades} from "hardhat";
-import {CDKValidium} from "../../typechain-types";
+import {CDKDataCommittee, CDKValidium} from "../../typechain-types";
 import {ProxyAdmin} from "../../typechain-types";
 
 const pathOutputJson = path.join(__dirname, "./upgrade_outputL1.json");
@@ -128,7 +128,7 @@ async function main() {
 
     const proxyAdminAddress = await upgrades.erc1967.getAdminAddress(currentPolygonValidiumAddress as string);
     const proxyAdminFactory = await ethers.getContractFactory("@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol:ProxyAdmin", deployer);
-    const proxyAdmin  = proxyAdminFactory.attach(proxyAdminAddress) as ProxyAdmin;;
+    const proxyAdmin  = proxyAdminFactory.attach(proxyAdminAddress) as ProxyAdmin;
     console.log('proxyAdminAddress', proxyAdminAddress)
 
     // deploy new verifier
@@ -159,6 +159,16 @@ async function main() {
     console.log("you can verify the new impl address with:");
     console.log(`npx hardhat verify ${newDAImpl.target} --network ${process.env.HARDHAT_NETWORK}`);
 
+    const CDKDataCommitteeFactory = await ethers.getContractFactory("CDKDataCommittee");
+    const CDKDataCommitteeContract = (await CDKDataCommitteeFactory.attach(currentCDKDataCommitteeAddress)) as CDKDataCommittee;
+    const memberCnt = await CDKDataCommitteeContract.getAmountOfMembers();
+    console.log("current members: ");
+    let member;
+    for (let i = 0; i < memberCnt; i++) {
+        member = await CDKDataCommitteeContract.members(i);
+        console.log(member[0], member[1]);
+    }
+
     const operationDA = genOperation(
         proxyAdmin.target,
         0, // value
@@ -166,7 +176,7 @@ async function main() {
         ethers.ZeroHash, // predecesoor
         salt // salt
     );
-    
+
 
     // Prepare Upgrade PolygonValidiumBridge
     const polygonValidiumBridgeFactory = await ethers.getContractFactory("ZKFairZkEVMBridgeV2", deployer);
@@ -314,9 +324,9 @@ async function main() {
 
     // Execute operation
     const executeData = timelockContractFactory.interface.encodeFunctionData("executeBatch", [
-        [operationGlobalExitRoot.target, operationBridge.target, operationRollupManager.target],
-        [operationGlobalExitRoot.value, operationBridge.value, operationRollupManager.value],
-        [operationGlobalExitRoot.data, operationBridge.data, operationRollupManager.data],
+        [operationGlobalExitRoot.target, operationBridge.target, operationRollupManager.target, operationDA.target],
+        [operationGlobalExitRoot.value, operationBridge.value, operationRollupManager.value, operationDA.value],
+        [operationGlobalExitRoot.data, operationBridge.data, operationRollupManager.data, operationDA.data],
         ethers.ZeroHash, // predecesoor
         salt, // salt
     ]);
