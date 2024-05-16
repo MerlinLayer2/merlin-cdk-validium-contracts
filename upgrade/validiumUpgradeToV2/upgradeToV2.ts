@@ -255,6 +255,9 @@ async function main() {
         "0x"
     );
     await newPolygonValidiumContract.waitForDeployment();
+    const tx = newPolygonValidiumContract.deploymentTransaction();
+    console.log(`current blk number: ${await currentProvider.getBlockNumber()}`)
+    console.log(`new ZkEVM deployment hash: ${tx?.hash}, blk number: ${tx?.blockNumber}`)
     console.log("#######################\n");
     console.log(`new PolygonValidium Proxy: ${newPolygonValidiumContract.target}`);
 
