@@ -7,19 +7,19 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "../lib/TokenWrapped.sol";
 import "../interfaces/IBasePolygonZkEVMGlobalExitRoot.sol";
 import "../interfaces/IBridgeMessageReceiver.sol";
-import "../interfaces/IZKFairZkEVMBridge.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "../lib/EmergencyManager.sol";
 import "../lib/GlobalExitRootLib.sol";
+import "../interfaces/ImerlinZkEVMBridge.sol";
 
 /**
  * PolygonZkEVMBridge that will be deployed on both networks Ethereum and Polygon zkEVM
  * Contract responsible to manage the token interactions with other networks
  */
-contract ZKFairZkEVMBridge is
+contract merlinZkEVMBridge is
 DepositContract,
 EmergencyManager,
-IZKFairZkEVMBridge
+ImerlinZkEVMBridge
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 

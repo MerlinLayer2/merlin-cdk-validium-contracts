@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.20;
 
-interface IZKFairZkEVMBridge {
+interface ImerlinZkEVMBridge {
     /**
      * @dev Thrown when sender is not the PolygonZkEVM address
      */
