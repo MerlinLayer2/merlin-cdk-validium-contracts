@@ -179,7 +179,7 @@ async function main() {
 
 
     // Prepare Upgrade PolygonValidiumBridge
-    const polygonValidiumBridgeFactory = await ethers.getContractFactory("merlinZkEVMBridgeV2", deployer);
+    const polygonValidiumBridgeFactory = await ethers.getContractFactory("MerlinZkEVMBridgeV2", deployer);
     const newBridgeImpl = await polygonValidiumBridgeFactory.deploy();
 
     console.log("#######################\n");

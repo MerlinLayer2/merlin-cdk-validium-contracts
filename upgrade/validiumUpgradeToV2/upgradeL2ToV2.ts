@@ -70,7 +70,7 @@ async function main() {
     console.log("deploying with: ", deployer.address);
 
     // Prepare Upgrade PolygonZkEVMBridge
-    const PreviousBridgeFactory = (await ethers.getContractFactory("merlinZkEVMBridge")) as any;
+    const PreviousBridgeFactory = (await ethers.getContractFactory("MerlinZkEVMBridge")) as any;
 
     // Import OZ upgrades
     await upgrades.forceImport(currentBridgeAddress as string, PreviousBridgeFactory, "transparent" as any);
@@ -96,7 +96,7 @@ async function main() {
     console.log("timelockAddress: ", timelockContract.target, {timelockDelay});
 
     // prapare upgrades
-    const polygonZkEVMBridgeFactory = await ethers.getContractFactory("merlinZkEVMBridgeV2", deployer);
+    const polygonZkEVMBridgeFactory = await ethers.getContractFactory("MerlinZkEVMBridgeV2", deployer);
 
     const newBridgeImpl = await upgrades.prepareUpgrade(currentBridgeAddress, polygonZkEVMBridgeFactory, {
         unsafeAllow: ["constructor"],

@@ -3,7 +3,7 @@
 pragma solidity ^0.8.20;
 import "../../interfaces/IBasePolygonZkEVMGlobalExitRoot.sol";
 
-interface ImerlinZkEVMBridgeV2 {
+interface IMerlinZkEVMBridgeV2 {
     /**
      * @dev Thrown when the destination network is invalid
      */
