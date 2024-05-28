@@ -1,26 +1,70 @@
-# zkevm-contracts
+# Overview
 
-Smart contract implementation which will be used by the polygon zkevm
+Merlin Chain is the first Bitcoin Layer 2 solution built on the Polygon CDK, fully integrating a ZK-Rollup network, decentralized oracle network, and on-chain BTC fraud proof module. By leveraging these advanced technologies, Merlin Chain offers Bitcoin users significantly lower fees, reduced operational complexity, enhanced functionality, and broader asset compatibility. Our mission is to enhance the native capabilities of Bitcoin, making its use more efficient and enjoyable, and ultimately, to Make Bitcoin Fun Again.
 
-[![Main CI](https://github.com/0xPolygonHermez/zkevm-contracts/actions/workflows/main.yml/badge.svg)](https://github.com/0xPolygonHermez/zkevm-contracts/actions/workflows/main.yml)
+# Merlin contracts
+
+This repository contains the key contracts deployed on both Layer 1 and Layer 2 for the Merlin mainnet and testnet. These contracts provide crucial support for batch submission, cross-chain asset registration, zk-proof verification, and the overall upgrade and management of the chain.
 
 ## Mainnet Contracts:
 
-| Contract Name                | Address                                                                                                               |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| PolygonRollupManager         | [0x5132A183E9F3CB7C848b0AAC5Ae0c4f0491B7aB2](https://etherscan.io/address/0x5132A183E9F3CB7C848b0AAC5Ae0c4f0491B7aB2) |
-| PolygonZkEVMBridgeV2         | [0x2a3DD3EB832aF982ec71669E178424b10Dca2EDe](https://etherscan.io/address/0x2a3DD3EB832aF982ec71669E178424b10Dca2EDe) |
-| PolygonZkEVMGlobalExitRootV2 | [0x580bda1e7A0CFAe92Fa7F6c20A3794F169CE3CFb](https://etherscan.io/address/0x580bda1e7A0CFAe92Fa7F6c20A3794F169CE3CFb) |
-| FflonkVerifier               | [0x4F9A0e7FD2Bf6067db6994CF12E4495Df938E6e9](https://etherscan.io/address/0x4F9A0e7FD2Bf6067db6994CF12E4495Df938E6e9) |
-| PolygonZkEVMDeployer         | [0xCB19eDdE626906eB1EE52357a27F62dd519608C2](https://etherscan.io/address/0xCB19eDdE626906eB1EE52357a27F62dd519608C2) |
-| PolygonZkEVMTimelock         | [0xEf1462451C30Ea7aD8555386226059Fe837CA4EF](https://etherscan.io/address/0xEf1462451C30Ea7aD8555386226059Fe837CA4EF) |
+### Layer 1
 
-## zkEVM Contracts:
+RPC: http://18.142.49.94:8545
 
-| Contract Name        | Address                                                                                                                        |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| PolygonZkEVMBridgeV2 | [0x2a3DD3EB832aF982ec71669E178424b10Dca2EDe](https://zkevm.polygonscan.com/address/0x2a3DD3EB832aF982ec71669E178424b10Dca2EDe) |
-| PolygonZkEVMTimelock | [0xBBa0935Fa93Eb23de7990b47F0D96a8f75766d13](https://zkevm.polygonscan.com/address/0xBBa0935Fa93Eb23de7990b47F0D96a8f75766d13) |
+| Contract Name | Address                                                                                                               |
+|---------------| --------------------------------------------------------------------------------------------------------------------- |
+| PolygonZkEVM  | 0xBf4B031eb29fc34E2bCb4327F9304BED3600cc46 |
+| PolygonRollupManager | 0x68DdbE6638d7514a9Ed0B9B2980B65970e532cdB |
+| PolToken | 0x9e2bC6EB2c9396ccbCC66353da011b67A0ff4604 |
+| polygonZkEVMGlobalExitRoot | 0x8b97BF5C42739C375a2db080813E9b4C9A4a2c9A |
+
+
+### Layer 2
+
+Explorer: https://scan.merlinchain.io
+
+| Contract Name             | Address                                                                                                               |
+|---------------------------| --------------------------------------------------------------------------------------------------------------------- |
+| CDKValidiumDeployer       | 0x9082c398077031e79E74C0A334cbC139C9c90851 |
+| ProxyAdmin                | 0x0f4F82b3E7B27A9f8eC1b21e9bC43fd113fF0cf3 |
+| PolygonZkEVMBridge    | 0xD7f0012F4909Ffa7e5DbfE5fbFf15aB734B42ED4 |
+| PolygonZkEVMGlobalExitRootL2 | 0xa40D5f56745a118D0906a34E69aeC8C0Db1cB8fA |
+| CDKValidiumTimelock | 0x7d72cc8E89B187a93581ee44FB1884b498989A40 |
+
+
+## Testnet Contracts:
+
+### Layer 1
+
+RPC: http://61.10.9.18:7545
+
+| Contract Name | Address                                                                                                               |
+|---------------| --------------------------------------------------------------------------------------------------------------------- |
+| PolygonZkEVM  | 0x8173da1A9d41287158E9b6E38Ca9CDabBAE6bb6B |
+| PolygonRollupManager | 0xAefb2f4db0766F0D76c47d0dbc0A712D653cace6 |
+| PolToken | 0xCC1975Bd1a1A2740ea47f9090f84755817049D94 |
+| polygonZkEVMGlobalExitRoot | 0x07eb659bd996Ac74c154dfe86Ea875570647961C |
+| CDKValidiumDeployer | 0x67c47bF785A538a96eF513507FbF6692170a9CB2 |
+| FflonkVerifier | 0x636e55e6a34A02ec8383A88Bd4b0796C4F155107 |
+| ProxyAdmin | 0x9ea2b4766D5af554053E7088149d7e5FF3dB5E07 |
+| PolygonZkEVMBridge | 0xCa122881173F773A5d2DF68c2917D906ebb7133A |
+| CDKDataCommittee | 0xC2B6bE3E2D867F199E056e8741D94949CB864ad2 |
+| 
+
+### Layer 2
+
+Explorer: https://testnet-scan.merlinchain.io
+
+| Contract Name             | Address                                                                                                               |
+|---------------------------| --------------------------------------------------------------------------------------------------------------------- |
+| CDKValidiumDeployer       | 0x357a1B9013Ab0175AE6802508D9Fc16A5b160b36 |
+| ProxyAdmin                | 0x3Ee5586DEd0f89b82b90eeDE1aF929f6b45b48E3 |
+| PolygonZkEVMBridge    | 0x5f1E2a726d1Fc49fb6B98b9A2041399823D6f3A9 |
+| PolygonZkEVMGlobalExitRootL2 | 0xa40d5f56745a118d0906a34e69aec8c0db1cb8fa |
+| CDKValidiumTimelock | 0x1434Da5133F8C56D69294Ee2CF4E6E386cfEbABa |
+
+
 
 ## Requirements
 
@@ -42,43 +86,5 @@ npm run test
 ## Deploy on hardhat
 
 ```
-npm run deploy:ZkEVM:hardhat
-```
-
-## Build dockers
-
-```
-npm run docker:contracts
-```
-
-Or if using new docker-compose version
-
-```
-npm run dockerv2:contracts
-```
-
-A new docker `hermeznetwork/geth-zkevm-contracts` will be created
-This docker will contain a geth node with the deployed contracts
-The deployment output can be found in: `docker/deploymentOutput/deploy_output.json`
-To run the docker you can use: `docker run -p 8545:8545 hermeznetwork/geth-zkevm-contracts`
-
-## Note
-
-In order to test, the following private keys are being used. These keys are not meant to be used in any production environment:
-
--   private key: `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`
-    -   address:`0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266`
--   private key: `0xdfd01798f92667dbf91df722434e8fbe96af0211d4d1b82bbbbc8f1def7a814f`
-    -   address:`0xc949254d682d8c9ad5682521675b8f43b102aec4`
-
-# Verify Deployed Smart Contracts
-
-To verify that the smartcontracts of this repository are the same deployed on mainnet, you could follow the instructions described [document](verifyMainnetDeployment/verifyDeployment.md)
-
-The smartcontract used to verify a proof, it's a generated contract from zkEVM Rom and Pil (constraints). To verify the deployment of this smartcontract you could follow the instructions described in this [document](verifyMainnetDeployment/verifyMainnetProofVerifier.md)
-
-## Activate github hook
-
-```
-git config --local core.hooksPath .githooks/
+npm run deploy:testnet:ZkEVM:localhost
 ```
