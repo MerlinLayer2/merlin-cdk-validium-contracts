@@ -43,7 +43,7 @@ const config: HardhatUserConfig = {
                         enabled: true,
                         runs: 999999,
                     },
-                    evmVersion: "paris",
+                    evmVersion: "shanghai",
                 },
             },
             {
@@ -82,7 +82,7 @@ const config: HardhatUserConfig = {
                         enabled: true,
                         runs: 500,
                     },
-                    evmVersion: "paris",
+                    evmVersion: "shanghai",
                 }, // try yul optimizer
             },
             "contracts/v2/PolygonZkEVMBridgeV2.sol": {
@@ -92,7 +92,7 @@ const config: HardhatUserConfig = {
                         enabled: true,
                         runs: 999,
                     },
-                    evmVersion: "paris",
+                    evmVersion: "shanghai",
                 },
             },
             "contracts/v2/newDeployments/PolygonRollupManagerNotUpgraded.sol": {
@@ -102,7 +102,7 @@ const config: HardhatUserConfig = {
                         enabled: true,
                         runs: 500,
                     },
-                    evmVersion: "paris",
+                    evmVersion: "shanghai",
                 }, // try yul optimizer
             },
             "contracts/v2/mocks/PolygonRollupManagerMock.sol": {
@@ -112,7 +112,7 @@ const config: HardhatUserConfig = {
                         enabled: true,
                         runs: 10,
                     },
-                    evmVersion: "paris",
+                    evmVersion: "shanghai",
                 }, // try yul optimizer
             },
             // Should have the same optimizations than the RollupManager to verify
@@ -123,7 +123,7 @@ const config: HardhatUserConfig = {
                         enabled: true,
                         runs: 500,
                     },
-                    evmVersion: "paris",
+                    evmVersion: "shanghai",
                 }, // try yul optimizer
             },
             "contracts/v2/utils/ClaimCompressor.sol": {
@@ -133,7 +133,7 @@ const config: HardhatUserConfig = {
                         enabled: true,
                         runs: 999999,
                     },
-                    evmVersion: "paris",
+                    evmVersion: "shanghai",
                     //viaIR: true,
                 },
             },

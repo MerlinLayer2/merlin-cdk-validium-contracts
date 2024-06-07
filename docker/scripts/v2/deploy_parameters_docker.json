@@ -9,6 +9,7 @@
  "trustedAggregatorTimeout": 604799,
  "pendingStateTimeout": 604799,
  "emergencyCouncilAddress": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+ "dataAvailabilityProtocol": "PolygonDataCommittee",
  "polTokenAddress": "",
  "zkEVMDeployerAddress": "",
  "gasTokenAddress": "",
