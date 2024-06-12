@@ -132,6 +132,20 @@ async function main() {
         [deployer] = await ethers.getSigners();
     }
 
+    // Load adminZkEVM account
+    let admin;
+    if (createRollupParameters.adminZkEVM != deployer.address) {
+        if (!createRollupParameters.adminPvtKey) {
+            throw new Error('`adminPvtKey` in `create_rollup_parameters.json` is required.');
+        }
+        admin = new ethers.Wallet(createRollupParameters.adminPvtKey, currentProvider);
+        if (admin.address != createRollupParameters.adminZkEVM) {
+            throw new Error('`adminPvtKey` must be private key to the address `adminZkEVM`.');
+        }
+    } else {
+        admin = deployer;
+    }
+
     // Load Rollup manager
     const PolgonRollupManagerFactory = await ethers.getContractFactory("PolygonRollupManager", deployer);
     const rollupManagerContract = PolgonRollupManagerFactory.attach(
@@ -279,20 +293,27 @@ async function main() {
         }
         await polygonDataCommittee?.waitForDeployment();
 
-        // Load data commitee
-        const PolygonValidiumContract = (await PolygonconsensusFactory.attach(newZKEVMAddress)) as PolygonValidium;
-        // add data commitee to the consensus contract
-        if ((await PolygonValidiumContract.admin()) == deployer.address) {
-            await (
-                await PolygonValidiumContract.setDataAvailabilityProtocol(polygonDataCommittee?.target as any)
-            ).wait();
-
-            // Setup data commitee to 0
-            await (await polygonDataCommittee?.setupCommittee(0, [], "0x")).wait();
-        } else {
-            await (await polygonDataCommittee?.transferOwnership(adminZkEVM)).wait();
+        // fund admin account
+        if (admin && admin.address != deployer.address) {
+            const tx = await deployer.sendTransaction({
+              to: admin.address,
+              value: '0x16345785d8a0000',  // 0.1 ether
+            });
+            await tx.wait();
         }
 
+        // Load data commitee
+        const PolygonValidiumContract = (await PolygonconsensusFactory.attach(newZKEVMAddress)) as PolygonValidium;
+
+        // add data commitee to the consensus contract
+        console.log("setDataAvailabilityProtocol...");
+        await (await PolygonValidiumContract.connect(admin).setDataAvailabilityProtocol(polygonDataCommittee?.target as any)).wait();
+
+        // Setup data commitee to 0
+        console.log("setupCommittee...");
+        await (await polygonDataCommittee?.setupCommittee(0, [], "0x")).wait();
+
+        await (await polygonDataCommittee?.transferOwnership(adminZkEVM)).wait();
         outputJson.polygonDataCommitteeAddress = polygonDataCommittee?.target;
     }
 
