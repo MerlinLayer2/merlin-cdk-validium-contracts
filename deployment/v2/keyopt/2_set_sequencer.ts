@@ -107,38 +107,6 @@ const contractABI3 = [
     }
 ]
 
-async function transferOwnership(wallet: any,contractAddress: string,newOwner: string) {
-    try {
-        let currentProvider = ethers.provider;
-
-        //console.log('privateKey:', privateKey)
-
-        //const signerNode = await currentProvider.getSigner();
-        const contract = new ethers.Contract(contractAddress, contractABI, wallet.connect(currentProvider));
-
-        const tx = await contract.transferOwnership(newOwner);
-        const receipt = await tx.wait();
-
-        console.log('Ownership transfer transaction:', receipt);
-    } catch (error) {
-        console.error('Error changing ownership:', error);
-    }
-}
-
-async function setupCommitte(wallet: any, contractAddress: string, _requiredAmountOfSignatures: number, urls: string[], addrsBytes: Uint8Array) {
-    try {
-        let currentProvider = ethers.provider;
-        const contract = new ethers.Contract(contractAddress, contractABI2, wallet.connect(currentProvider));
-
-        const tx = await contract.setupCommittee(_requiredAmountOfSignatures, urls, addrsBytes);
-        const receipt = await tx.wait();
-
-        console.log('Committee setup transaction:', receipt);
-    } catch (error) {
-        console.error('Error setting up committee:', error);
-    }
-}
-
 async function setTrustedSequencer(wallet: any, contractAddress: string, newTrustedSequencer: string) {
     try {
         let currentProvider = ethers.provider;
@@ -198,7 +166,7 @@ async function main() {
     let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim(); //todo
     const wallet = new ethers.Wallet(privateKey);
 
-    const polygonZkEVMAddress = '0x8dAF17A20c9DBA35f005b6324F493785D239719d'
+    const polygonZkEVMAddress = parameters.polygonZkEVMAddress //
     //parameters.trustedSequencer parameters.trustedSequencerURL
     console.log('polygonZkEVMAddress:', polygonZkEVMAddress,'begin to set to:', 'trustedSequencer:', parameters.trustedSequencer, 'trustedSequencerURL:', parameters.trustedSequencerURL)
     setTrustedSequencer(wallet, polygonZkEVMAddress, parameters.trustedSequencer)

@@ -7,7 +7,7 @@ const data = require('./grantRoleOutput2.json');
 const addRollupParameters = require("./grantRole.json");
 
 async function main() {
-    const {accountToGrantRole, polygonRollupManagerAddress, timelockAddress, timelockDelay} = addRollupParameters;
+    const { timelockAddress } = addRollupParameters;
     // 提取 scheduleData 和 executeData
 
     const changeAdminRoles = [

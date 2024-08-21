@@ -3,6 +3,7 @@
 import {expect} from "chai";
 import path = require("path");
 import fs = require("fs");
+import {ethers as ethers2} from "ethers";
 
 import * as dotenv from "dotenv";
 dotenv.config({path: path.resolve(__dirname, "../../.env")});
@@ -34,6 +35,27 @@ const contractABI2 = [{
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
+}, {
+    "constant": true,
+    "inputs": [{"name": "", "type": "uint256"}],
+    "name": "members",
+    "outputs": [
+        {"name": "url", "type": "string"},
+        {"name": "addr", "type": "address"}
+    ],
+    "type": "function"
+},{
+    "inputs": [],
+    "name": "getAmountOfMembers",
+    "outputs": [
+        {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }
+    ],
+    "stateMutability": "view",
+    "type": "function"
 }]
 
 async function setupCommitte(wallet: any, contractAddress: string, _requiredAmountOfSignatures: number, urls: string[], addrsBytes: Uint8Array) {
@@ -47,6 +69,23 @@ async function setupCommitte(wallet: any, contractAddress: string, _requiredAmou
         console.log('Committee setup transaction:', receipt);
     } catch (error) {
         console.error('Error setting up committee:', error);
+    }
+}
+
+async function getCommitteeMembers(wallet: any, contractAddress: string) {
+    try {
+        let currentProvider = ethers.provider;
+        const contract = new ethers.Contract(contractAddress, contractABI2, wallet.connect(currentProvider));
+
+        console.log('datacommittee contract address', contractAddress)
+        const memberCount = await contract.getAmountOfMembers();
+        console.log('Amount of committee members:', memberCount.toString());
+        for (let i = 0; i < memberCount; i++) {
+            const member = await contract.members(i);
+            console.log(`Member ${i}:`, member);
+        }
+    } catch (error) {
+        console.error('Error getting committee members:', error);
     }
 }
 
@@ -65,7 +104,10 @@ async function main() {
     //@ts-ignore
     const addrsBytes = new Uint8Array(addresses.map(address => Array.from(ethers2.utils.arrayify(address))).flat());
 
-    setupCommitte(wallet, cdkDataCommitteeContract, _requiredAmountOfSignatures, urls, addrsBytes);
+    getCommitteeMembers(wallet, cdkDataCommitteeContract)
+
+    //todo open
+    //setupCommitte(wallet, cdkDataCommitteeContract, _requiredAmountOfSignatures, urls, addrsBytes);
 }
 
 main().catch((e) => {

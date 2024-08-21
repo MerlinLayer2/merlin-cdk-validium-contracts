@@ -1,8 +1,8 @@
 {
   "polygonZkEVMAddress": "0x8dAF17A20c9DBA35f005b6324F493785D239719d",
-  "trustedSequencer": "0xDCdB53f6633c9D290971Af961689c96B73B79c75",
+  "trustedSequencer": "0xE3Db5e3cfDbBa56FfdDED5792DaAB8A2DC9c52c4",
   "trustedSequencerURL": "https://new-sequencer",
-  "cdkDataCommitteeContract": "0x8dAF17A20c9DBA35f005b6324F493785D239719d",
+  "cdkDataCommitteeContract": "0x5Bd9bF8c2F6cd23fA3f62c2f32d79b1784DBAc4b",
   "committeeAddr": [
     "0x8dAF17A20c9DBA35f005b6324F493785D239719d",
     "0x8dAF17A20c9DBA35f005b6324F493785D239719d",
@@ -18,5 +18,6 @@
     "https://da-node-05"
   ],
   "committeeThreshold": 3,
-  "cdkValidiumDeployerContract": ""
+  "cdkValidiumDeployerContract": "0x58556D60e530F89226FC12a3C2DA449fD3bbc90a",
+  "timelockAddress": "0x2b1F1658065AdFfC13693054B60d157F7c02038f"
 }

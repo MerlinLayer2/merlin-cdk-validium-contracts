@@ -39,9 +39,11 @@ async function main() {
     const changeValidiumRoles = [
         "EMERGENCY_COUNCIL_ADMIN", //使用 cdkValidiumOwner.privatekey
     ]
-    const timeLockAdmin = [
-        "DEFAULT_ADMIN_ROLE",
-    ]
+    
+    //todo
+    // const timeLockAdmin = [
+    //     "DEFAULT_ADMIN_ROLE",
+    // ]
 
     let deployerPath = keyPathParameters.new_adminKeyPath
     let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
@@ -60,13 +62,13 @@ async function main() {
         await genByRole(polygonRollupManagerAddress, outputJson, wallet, changeValidiumRoles[i],newValidiumAddress,salt, timelockDelay)
     }
 
-    const newTimeLockAdmin = keyPathParameters.new_timeLockKeyMultiSignerAddress
-    deployerPath = keyPathParameters.new_timeLockKeyPath
-    privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
-    wallet = new ethers.Wallet(privateKey);
-    for (let i = 0; i < timeLockAdmin.length; i++) {
-        await genByRole(timelockAddress, outputJson, wallet, timeLockAdmin[i],newTimeLockAdmin,salt, timelockDelay)
-    }
+    // const newTimeLockAdmin = keyPathParameters.new_timeLockKeyMultiSignerAddress
+    // deployerPath = keyPathParameters.new_timeLockKeyPath
+    // privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
+    // wallet = new ethers.Wallet(privateKey);
+    // for (let i = 0; i < timeLockAdmin.length; i++) {
+    //     await genByRole(timelockAddress, outputJson, wallet, timeLockAdmin[i],newTimeLockAdmin,salt, timelockDelay)
+    // }
 
     console.log(outputJson)
     fs.writeFileSync(pathOutputJson, JSON.stringify(outputJson, null, 1));
