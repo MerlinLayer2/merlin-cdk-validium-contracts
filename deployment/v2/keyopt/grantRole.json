@@ -1,0 +1,18 @@
+{
+    "roleName": [
+        "OBSOLETE_ROLLUP_TYPE_ROLE",
+        "CREATE_ROLLUP_ROLE",
+        "STOP_EMERGENCY_ROLE",
+        "TWEAK_PARAMETERS_ROLE",
+        "SET_FEE_ROLE",
+        "TRUSTED_AGGREGATOR_ROLE_ADMIN"
+    ],
+    "accountToGrantRole": "0xDCdB53f6633c9D290971Af961689c96B73B79c75",
+    "polygonRollupManagerAddress": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+    "timelockAddress": "0x5Cf7f7b7fC3d3D9d6d3e1fAe8B5f0b9f1d6e2fA8",
+    "timelockDelay": 1,
+    "deployerPvtKey": "",
+    "maxFeePerGas": "",
+    "maxPriorityFeePerGas": "",
+    "multiplierGas": ""
+}

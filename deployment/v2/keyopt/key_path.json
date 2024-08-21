@@ -1,0 +1,17 @@
+{
+  "adminKeyPath": "/Users/oker/go/src/github.com/MerlinLayer2/merlin-cdk-validium-contracts/deployment/v2/keyopt/keypath/admin.privateKey",
+  "cdkValidiumOwnerKeyPath": "/Users/oker/go/src/github.com/MerlinLayer2/merlin-cdk-validium-contracts/deployment/v2/keyopt/keypath/admin.privateKey",
+  "timeLockKeyPath": "/Users/oker/go/src/github.com/MerlinLayer2/merlin-cdk-validium-contracts/deployment/v2/keyopt/keypath/admin.privateKey",
+  "sequencerKeyPath": "/Users/oker/go/src/github.com/MerlinLayer2/merlin-cdk-validium-contracts/deployment/v2/keyopt/keypath/admin.privateKey",
+  "deployParameterPath":"/Users/oker/go/src/github.com/MerlinLayer2/merlin-cdk-validium-contracts/deployment/v2/keyopt/keypath/admin.privateKey",
+  "new_adminKeyPath": "/Users/oker/go/src/github.com/MerlinLayer2/merlin-cdk-validium-contracts/deployment/v2/keyopt/keypath/admin.privateKey",
+  "new_cdkValidiumOwnerKeyPath": "/Users/oker/go/src/github.com/MerlinLayer2/merlin-cdk-validium-contracts/deployment/v2/keyopt/keypath/admin.privateKey",
+  "new_timeLockKeyPath": "/Users/oker/go/src/github.com/MerlinLayer2/merlin-cdk-validium-contracts/deployment/v2/keyopt/keypath/admin.privateKey",
+  "new_sequencerKeyPath": "/Users/oker/go/src/github.com/MerlinLayer2/merlin-cdk-validium-contracts/deployment/v2/keyopt/keypath/admin.privateKey",
+  "new_deployParameterPath":"/Users/oker/go/src/github.com/MerlinLayer2/merlin-cdk-validium-contracts/deployment/v2/keyopt/keypath/admin.privateKey",
+  "new_adminKeyMultiSignerAddress": "0xDCdB53f6633c9D290971Af961689c96B73B79c75",
+  "new_cdkValidiumOwnerKeyMultiSignerAddress": "0xDCdB53f6633c9D290971Af961689c96B73B79c75",
+  "new_timeLockKeyMultiSignerAddress": "0xDCdB53f6633c9D290971Af961689c96B73B79c75",
+  "new_sequencerKeyMultiSignerAddress": "0xDCdB53f6633c9D290971Af961689c96B73B79c75",
+  "new_deployParameterMultiSignerAddress": "0xDCdB53f6633c9D290971Af961689c96B73B79c75"
+}
