@@ -1,13 +1,13 @@
 import fs from 'fs';
-import {ethers} from "hardhat";
+import { ethers } from 'hardhat';
 
-import keyPathParameters from "./key_path.json";
+import keyPathParameters from './key_path.json';
 
 const data = require('./grantRoleOutput2.json');
-const addRollupParameters = require("./grantRole.json");
+const parameters = require('./parameters.json');
 
 async function main() {
-    const { timelockAddress } = addRollupParameters;
+    const { timelockAddress } = parameters;
     // 提取 scheduleData 和 executeData
 
     const changeAdminRoles = [
@@ -15,17 +15,17 @@ async function main() {
     ];
     const currentProvider = ethers.provider;
 
-    const deployerPath = keyPathParameters.adminKeyPath
+    const deployerPath = keyPathParameters.timeLockKeyPath;
     const privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
     const wallet = new ethers.Wallet(privateKey);
     const deployer = wallet.connect(currentProvider);
 
     for (let i = 0; i < changeAdminRoles.length; i++) {
-        const { executeData } = data[changeAdminRoles[i]];
+        const { scheduleData } = data[changeAdminRoles[i]];
         // eslint-disable-next-line no-await-in-loop
         const transactionResponse = await deployer.sendTransaction({
             to: timelockAddress,
-            data: executeData,
+            data: scheduleData,
         });
 
         // 等待交易被挖矿

@@ -8,19 +8,16 @@ import * as dotenv from "dotenv";
 dotenv.config({path: path.resolve(__dirname, "../../.env")});
 import {ethers} from "hardhat";
 
-const addRollupParameters = require("./grantRole.json");
 const parameters = require("./parameters.json");
 const keyPathParameters = require("./key_path.json");
 
 const pathOutputJson = path.join(__dirname, "./grantRoleOutput.json");
-import {PolygonRollupManager} from "../../typechain-types";
 
 async function main() {
-    //getRoleAdmin(ethers.id("TRUSTED_AGGREGATOR_ROLE_ADMIN"))
     const outputJson = {} as any;
 
-    const {accountToGrantRole, polygonRollupManagerAddress, timelockAddress, timelockDelay} = addRollupParameters;
-    const salt = addRollupParameters.timelockSalt || ethers.ZeroHash;
+    const {polygonRollupManagerAddress, timelockDelay} = parameters;
+    const salt = parameters.timelockSalt || ethers.ZeroHash;
 
     const changeAdminRoles = [
         // "DEFAULT_ADMIN_ROLE",
@@ -39,11 +36,6 @@ async function main() {
     const changeValidiumRoles = [
         "EMERGENCY_COUNCIL_ADMIN", //使用 cdkValidiumOwner.privatekey
     ]
-    
-    //todo
-    // const timeLockAdmin = [
-    //     "DEFAULT_ADMIN_ROLE",
-    // ]
 
     let deployerPath = keyPathParameters.new_adminKeyPath
     let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
@@ -51,7 +43,7 @@ async function main() {
     const newAdminAddress = keyPathParameters.new_adminKeyMultiSignerAddress
     // for in changeAdminRoles
     for (let i = 0; i < changeAdminRoles.length; i++) {
-        await genByRole(polygonRollupManagerAddress, outputJson, wallet, changeAdminRoles[i], newAdminAddress,salt, timelockDelay)
+        await genByRole(polygonRollupManagerAddress, outputJson, wallet, changeAdminRoles[i], newAdminAddress, salt, timelockDelay)
     }
 
     const newValidiumAddress = keyPathParameters.new_cdkValidiumOwnerKeyMultiSignerAddress
@@ -59,7 +51,7 @@ async function main() {
     privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
     wallet = new ethers.Wallet(privateKey);
     for (let i = 0; i < changeValidiumRoles.length; i++) {
-        await genByRole(polygonRollupManagerAddress, outputJson, wallet, changeValidiumRoles[i],newValidiumAddress,salt, timelockDelay)
+        await genByRole(polygonRollupManagerAddress, outputJson, wallet, changeValidiumRoles[i], newValidiumAddress, salt, timelockDelay)
     }
 
     // const newTimeLockAdmin = keyPathParameters.new_timeLockKeyMultiSignerAddress

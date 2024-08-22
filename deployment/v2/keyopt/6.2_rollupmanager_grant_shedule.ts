@@ -4,11 +4,10 @@ import {ethers} from "hardhat";
 import keyPathParameters from "./key_path.json";
 
 const data = require('./grantRoleOutput.json');
-const addRollupParameters = require("./grantRole.json");
-
+const parameters = require('./parameters.json');
 
 async function main() {
-    const {accountToGrantRole, polygonRollupManagerAddress, timelockAddress, timelockDelay} = addRollupParameters;
+    const { timelockAddress } = parameters;
     // 提取 scheduleData 和 executeData
 
     const changeAdminRoles = [
@@ -21,12 +20,13 @@ async function main() {
         'TRUSTED_AGGREGATOR_ROLE_ADMIN',
     ];
     const changeValidiumRoles = [
-        'EMERGENCY_COUNCIL_ADMIN', // 使用 cdkValidiumOwner.privatekey
+        'EMERGENCY_COUNCIL_ADMIN',
     ];
 
-    let deployerPath = keyPathParameters.adminKeyPath
-    let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
-    let wallet = new ethers.Wallet(privateKey);
+    const currentProvider = ethers.provider;
+    const deployerPath = keyPathParameters.timeLockKeyPath;
+    const privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
+    const wallet = new ethers.Wallet(privateKey).connect(currentProvider);
 
     for (let i = 0; i < changeAdminRoles.length; i++) {
         const { scheduleData } = data[changeAdminRoles[i]];
@@ -44,12 +44,8 @@ async function main() {
         console.log(receipt);
     }
 
-    deployerPath = keyPathParameters.cdkValidiumOwnerKeyPath;
-    privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
-    wallet = new ethers.Wallet(privateKey);
-
     for (let i = 0; i < changeValidiumRoles.length; i++) {
-        const { scheduleData } = data[changeAdminRoles[i]];
+        const { scheduleData } = data[changeValidiumRoles[i]];
         // eslint-disable-next-line no-await-in-loop
         const transactionResponse = await wallet.sendTransaction({
             to: timelockAddress,
