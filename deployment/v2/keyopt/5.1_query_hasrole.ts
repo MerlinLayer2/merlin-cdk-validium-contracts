@@ -86,6 +86,9 @@ async function main() {
     ]
     const timelockAdminRoles = [
         "TIMELOCK_ADMIN_ROLE",
+        'PROPOSER_ROLE',
+        'EXECUTOR_ROLE',
+        'CANCELLER_ROLE',
     ]
     console.log('=======================1 admin check ============================')
     const adminAddress = keyPathParameters.adminKeySignerAddress

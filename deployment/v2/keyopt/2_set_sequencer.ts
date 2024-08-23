@@ -162,7 +162,7 @@ async function getTrustedSequencerURL(wallet: any, contractAddress: string) {
 }
 
 async function main() {
-    let deployerPath = keyPathParameters.deployParameterPath
+    let deployerPath = keyPathParameters.adminKeyPath
     let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim(); //todo
     const wallet = new ethers.Wallet(privateKey);
 
@@ -173,7 +173,7 @@ async function main() {
     //sleep 2 seconds
     await new Promise((resolve) => { setTimeout(resolve, 2000); });
     setTrustedSequencerURL(wallet, polygonZkEVMAddress, parameters.trustedSequencerURL)
-    await new Promise((resolve) => { setTimeout(resolve, 2000); });
+    //await new Promise((resolve) => { setTimeout(resolve, 2000); });
     console.log('==========================set done query new trusted sequencer and url==========================')
     getTrustedSequencer(wallet, polygonZkEVMAddress)
     getTrustedSequencerURL(wallet, polygonZkEVMAddress)

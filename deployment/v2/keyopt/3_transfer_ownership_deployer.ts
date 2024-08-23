@@ -28,19 +28,14 @@ const contractABI = [{
     "type": "function"
 }]
 
-async function transferOwnership(wallet: any,contractAddress: string,newOwner: string) {
+async function transferOwnership(wallet: any, contractAddress: string, newOwner: string) {
     try {
-        let currentProvider = ethers.provider;
-
-        //console.log('privateKey:', privateKey)
-
-        //const signerNode = await currentProvider.getSigner();
-        const contract = new ethers.Contract(contractAddress, contractABI, wallet.connect(currentProvider));
+        const contract = new ethers.Contract(contractAddress, contractABI, wallet);
 
         const tx = await contract.transferOwnership(newOwner);
         const receipt = await tx.wait();
 
-        console.log('Ownership transfer transaction:', receipt);
+        console.log('Ownership transfer transaction: to newOwner', newOwner, receipt);
     } catch (error) {
         console.error('Error changing ownership:', error);
     }
@@ -50,8 +45,9 @@ async function transferOwnership(wallet: any,contractAddress: string,newOwner: s
 async function main() {
     let deployerPath = keyPathParameters.deployParameterPath
     //读deployerPath里面的私钥
+    let currentProvider = ethers.provider;
     let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
-    const wallet = new ethers.Wallet(privateKey);
+    const wallet = new ethers.Wallet(privateKey).connect(currentProvider)
 
     console.log('transferOwnership ')
     const newDeployer = keyPathParameters.deployParameterPath
@@ -60,20 +56,8 @@ async function main() {
     const dataCommitteeContractAddress = parameters.cdkDataCommitteeContract    //cdkDataCommittee
     transferOwnership(wallet, dataCommitteeContractAddress, newMultiSignerAddr)
 
-    //cdkValidiumDeployerContract": "0x58556D60e530F89226FC12a3C2DA449fD3bbc90a
     const cdkValidiumDeployerContract = parameters.cdkValidiumDeployerContract
     transferOwnership(wallet, cdkValidiumDeployerContract, newMultiSignerAddr)
-
-    // // 2.setupCommittee
-    // // "cdkDataCommitteeContract": "0x5Bd9bF8c2F6cd23fA3f62c2f32d79b1784DBAc4b",
-    // const cdkDataCommitteeContract = '0x5Bd9bF8c2F6cd23fA3f62c2f32d79b1784DBAc4b'
-    // const _requiredAmountOfSignatures = parameters.committeeThreshold
-    // const urls = parameters.committeeUrl
-    // const addresses = parameters.committeeAddr
-    // @ts-ignore
-    //const addrsBytes = new Uint8Array(addresses.map(address => Array.from(ethers2.utils.arrayify(address))).flat());
-
-    //setupCommitte(wallet, cdkDataCommitteeContract, _requiredAmountOfSignatures, urls, addrsBytes);
 }
 
 main().catch((e) => {

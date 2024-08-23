@@ -12,6 +12,9 @@ async function main() {
 
     const changeAdminRoles = [
         'TIMELOCK_ADMIN_ROLE',
+        'PROPOSER_ROLE',
+        'EXECUTOR_ROLE',
+        'CANCELLER_ROLE',
     ];
     const currentProvider = ethers.provider;
 

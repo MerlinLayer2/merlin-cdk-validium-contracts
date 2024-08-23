@@ -90,7 +90,7 @@ async function getCommitteeMembers(wallet: any, contractAddress: string) {
 }
 
 async function main() {
-    let deployerPath = keyPathParameters.new_deployParameterPath //todo right?
+    let deployerPath = keyPathParameters.deployParameterPath
     let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
     const wallet = new ethers.Wallet(privateKey);
 
@@ -102,12 +102,13 @@ async function main() {
     const urls = parameters.committeeUrl
     const addresses = parameters.committeeAddr
     //@ts-ignore
-    const addrsBytes = new Uint8Array(addresses.map(address => Array.from(ethers2.utils.arrayify(address))).flat());
+    //const addrsBytes = new Uint8Array(addresses.map(address => Array.from(ethers2.utils.arrayify(address))).flat());
+    const addrsBytes = new Uint8Array(addresses.map(address => Array.from(Buffer.from(address.slice(2), 'hex'))).flat());
 
     getCommitteeMembers(wallet, cdkDataCommitteeContract)
 
     //todo open
-    //setupCommitte(wallet, cdkDataCommitteeContract, _requiredAmountOfSignatures, urls, addrsBytes);
+    setupCommitte(wallet, cdkDataCommitteeContract, _requiredAmountOfSignatures, urls, addrsBytes);
 }
 
 main().catch((e) => {

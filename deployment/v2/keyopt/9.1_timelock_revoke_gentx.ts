@@ -1,43 +1,42 @@
-/* eslint-disable no-await-in-loop, no-use-before-define, no-lonely-if */
-/* eslint-disable no-console, no-inner-declarations, no-undef, import/no-unresolved */
-import {expect} from "chai";
 import path = require("path");
 import fs = require("fs");
 
 import * as dotenv from "dotenv";
-dotenv.config({path: path.resolve(__dirname, "../../.env")});
 import {ethers} from "hardhat";
+dotenv.config({path: path.resolve(__dirname, "../../.env")});
+
 
 const parameters = require("./parameters.json");
 const keyPathParameters = require("./key_path.json");
 
-const pathOutputJson = path.join(__dirname, "./grantRoleOutput2.json");
+const pathOutputJson = path.join(__dirname, "./revokeRoleOutput2.json");
 
 async function main() {
-    //getRoleAdmin(ethers.id("TRUSTED_AGGREGATOR_ROLE_ADMIN"))
     const outputJson = {} as any;
 
-    const {timelockAddress, timelockDelay} = parameters;
+    const {polygonRollupManagerAddress, timelockDelay} = parameters;
     const salt = parameters.timelockSalt || ethers.ZeroHash;
 
     const changeAdminRoles = [
         'TIMELOCK_ADMIN_ROLE',
         'PROPOSER_ROLE',
         'EXECUTOR_ROLE',
-        'CANCELLER_ROLE',
+        'CANCELLER_ROLE'
     ];
 
-    let deployerPath = keyPathParameters.new_timeLockKeyPath
+    let deployerPath = keyPathParameters.timeLockKeyPath
     let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
-    let wallet = new ethers.Wallet(privateKey);
-    const newAdminAddress = keyPathParameters.new_timeLockKeyMultiSignerAddress
-
-    console.log(timelockAddress, newAdminAddress)
+    let wallet = new ethers.Wallet(privateKey)
+    const currentProvider = ethers.provider;
+    const deployer = wallet.connect(currentProvider)
+    const oldAdminAddress = keyPathParameters.new_timeLockKeyMultiSignerAddress
     // for in changeAdminRoles
     for (let i = 0; i < changeAdminRoles.length; i++) {
-        console.log('to grant address ', newAdminAddress)
-        await genByRole(timelockAddress, outputJson, wallet, changeAdminRoles[i], newAdminAddress, salt, timelockDelay)
+        await genByRole(polygonRollupManagerAddress, outputJson, deployer, changeAdminRoles[i], oldAdminAddress, salt, timelockDelay)
     }
+
+    console.log(outputJson)
+    fs.writeFileSync(pathOutputJson, JSON.stringify(outputJson, null, 1));
 }
 
 main().catch((e) => {
@@ -45,16 +44,15 @@ main().catch((e) => {
     process.exit(1);
 });
 
-async function genByRole(timelockAddress:string, outputJson: any,wallet: any, roleName: string, accountToGrantRole: string,salt: any,timelockDelay: any) {
+async function genByRole(polygonRollupManagerAddress:string, outputJson: any,wallet: any, roleName: string, accountToRevokeRole: string,salt: any,timelockDelay: any) {
     const roleID = ethers.id(roleName);
     const timelockContractFactory = await ethers.getContractFactory("PolygonZkEVMTimelock", wallet);
 
 
     const operation = genOperation(
-        timelockAddress,
+        polygonRollupManagerAddress,
         0, // value
-        timelockContractFactory.interface.encodeFunctionData("grantRole", [roleID, accountToGrantRole]),
-        //PolgonRollupManagerFactory.interface.encodeFunctionData("revokeRole", [roleID, accountToGrantRole]),
+        timelockContractFactory.interface.encodeFunctionData("revokeRole", [roleID, accountToRevokeRole]),
         ethers.ZeroHash, // predecesoor
         salt // salt
     );
@@ -96,9 +94,6 @@ async function genByRole(timelockAddress:string, outputJson: any,wallet: any, ro
     }
 
     outputJson[roleName].decodedScheduleData = objectDecoded;
-
-    console.log(outputJson)
-    fs.writeFileSync(pathOutputJson, JSON.stringify(outputJson, null, 1));
 }
 
 // OZ test functions

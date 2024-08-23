@@ -3,7 +3,7 @@ import { ethers } from 'hardhat';
 
 import keyPathParameters from './key_path.json';
 
-const data = require('./grantRoleOutput2.json');
+const data = require('./revokeRoleOutput2.json');
 const parameters = require('./parameters.json');
 
 async function main() {
@@ -18,17 +18,17 @@ async function main() {
     ];
     const currentProvider = ethers.provider;
 
-    const deployerPath = keyPathParameters.timeLockKeyPath;
+    const deployerPath = keyPathParameters.new_timeLockKeyPath;
     const privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
     const wallet = new ethers.Wallet(privateKey);
     const deployer = wallet.connect(currentProvider);
 
     for (let i = 0; i < changeAdminRoles.length; i++) {
-        const { scheduleData } = data[changeAdminRoles[i]];
+        const { executeData } = data[changeAdminRoles[i]];
         // eslint-disable-next-line no-await-in-loop
         const transactionResponse = await deployer.sendTransaction({
             to: timelockAddress,
-            data: scheduleData,
+            data: executeData,
         });
 
         // 等待交易被挖矿
