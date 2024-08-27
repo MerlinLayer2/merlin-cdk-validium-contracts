@@ -3,12 +3,12 @@
 import {expect} from "chai";
 import path = require("path");
 import fs = require("fs");
-import {ethers as ethers2} from "ethers";
 
 import * as dotenv from "dotenv";
 dotenv.config({path: path.resolve(__dirname, "../../.env")});
 import {ethers, upgrades} from "hardhat";
 import "../../helpers/utils";
+import {buildMultiSigBody} from "./utils";
 
 const keyPathParameters = require("./key_path.json");
 const parameters = require("./parameters.json");
@@ -66,7 +66,9 @@ async function setupCommitte(wallet: any, contractAddress: string, _requiredAmou
         const tx = await contract.setupCommittee(_requiredAmountOfSignatures, urls, addrsBytes);
         const receipt = await tx.wait();
 
-        console.log('Committee setup transaction:', receipt);
+        //const transactionResponse = await buildMultiSigBody(wallet.connect(currentProvider), contractABI2, 'setupCommittee', [_requiredAmountOfSignatures, urls, addrsBytes], contractAddress,  'submitTransaction', keyPathParameters.new_deployParameterMultiSignerAddress) //todo use new deployParameterPath
+        // let receipt = await transactionResponse.wait();
+        // console.log('setupCommittee submitTransaction', receipt);
     } catch (error) {
         console.error('Error setting up committee:', error);
     }
@@ -101,13 +103,11 @@ async function main() {
     const _requiredAmountOfSignatures = parameters.committeeThreshold
     const urls = parameters.committeeUrl
     const addresses = parameters.committeeAddr
-    //@ts-ignore
-    //const addrsBytes = new Uint8Array(addresses.map(address => Array.from(ethers2.utils.arrayify(address))).flat());
+
     const addrsBytes = new Uint8Array(addresses.map(address => Array.from(Buffer.from(address.slice(2), 'hex'))).flat());
 
     getCommitteeMembers(wallet, cdkDataCommitteeContract)
 
-    //todo open
     setupCommitte(wallet, cdkDataCommitteeContract, _requiredAmountOfSignatures, urls, addrsBytes);
 }
 

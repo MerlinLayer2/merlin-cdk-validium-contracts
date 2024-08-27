@@ -11,6 +11,7 @@ import "../../helpers/utils";
 
 const keyPathParameters = require("./key_path.json");
 const parameters = require("./parameters.json");
+import {buildMultiSigBody} from './utils'
 
 const contractABI = [{
     "inputs": [
@@ -110,10 +111,13 @@ const contractABI3 = [
 async function setTrustedSequencer(wallet: any, contractAddress: string, newTrustedSequencer: string) {
     try {
         let currentProvider = ethers.provider;
-        const contract = new ethers.Contract(contractAddress, contractABI3, wallet.connect(currentProvider));
+        //const contract = new ethers.Contract(contractAddress, contractABI3, wallet.connect(currentProvider));
 
-        const tx = await contract.setTrustedSequencer(newTrustedSequencer);
-        const receipt = await tx.wait();
+        const transactionResponse = await buildMultiSigBody(wallet.connect(currentProvider), contractABI3, 'setTrustedSequencer',[newTrustedSequencer], contractAddress,  'submitTransaction', keyPathParameters.new_adminKeyMultiSignerAddress)
+        let receipt = await transactionResponse.wait();
+
+        // const tx = await contract.setTrustedSequencer(newTrustedSequencer);
+        // const receipt = await tx.wait();
 
         console.log('Trusted sequencer setup transaction:', receipt);
     } catch (error) {
@@ -123,11 +127,15 @@ async function setTrustedSequencer(wallet: any, contractAddress: string, newTrus
 
 async function setTrustedSequencerURL(wallet: any, contractAddress: string, newTrustedSequencerURL: string) {
     try {
+        //const commitData = buildMultiSigBody(contractABI3, 'setTrustedSequencerURL', newTrustedSequencerURL, 'submitTransaction')
         let currentProvider = ethers.provider;
-        const contract = new ethers.Contract(contractAddress, contractABI3, wallet.connect(currentProvider));
+        //const contract = new ethers.Contract(contractAddress, contractABI3, wallet.connect(currentProvider));
 
-        const tx = await contract.setTrustedSequencerURL(newTrustedSequencerURL);
-        const receipt = await tx.wait();
+        const transactionResponse = await buildMultiSigBody(wallet.connect(currentProvider), contractABI3, 'setTrustedSequencerURL',[newTrustedSequencerURL], contractAddress,  'submitTransaction', keyPathParameters.new_adminKeyMultiSignerAddress)
+        let receipt = await transactionResponse.wait();
+
+        // const tx = await contract.setTrustedSequencerURL(newTrustedSequencerURL);
+        // const receipt = await tx.wait();
 
         console.log('Trusted sequencer URL setup transaction:', receipt);
     } catch (error) {
@@ -162,7 +170,7 @@ async function getTrustedSequencerURL(wallet: any, contractAddress: string) {
 }
 
 async function main() {
-    let deployerPath = keyPathParameters.adminKeyPath
+    let deployerPath = keyPathParameters.new_adminKeyPath
     let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim(); //todo
     const wallet = new ethers.Wallet(privateKey);
 
