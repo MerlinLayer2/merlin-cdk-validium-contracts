@@ -24,3 +24,17 @@ export async function buildMultiSigBody(wallet: any, abi1: any, func1:string, pa
     });
     return transactionResponse
 }
+
+export async function buildMultiSigBodyWithBody(wallet: any, data: any, contract1:string, func2: string, multiToAddr: string){
+    const contractInterface = new ethers2.Interface(MultiSigABI);
+    const dataCommit = contractInterface.encodeFunctionData(func2, [contract1, 0, data]);
+
+    let transactionResponse = await wallet.sendTransaction({
+        to: multiToAddr,
+        data: dataCommit,
+        value: 0,
+        gasLimit: 1000000,
+        gasPrice: ethers2.parseUnits('10', 'gwei'),
+    });
+    return transactionResponse
+}

@@ -29,7 +29,7 @@ async function main() {
     let wallet = new ethers.Wallet(privateKey)
     const currentProvider = ethers.provider;
     const deployer = wallet.connect(currentProvider)
-    const oldAdminAddress = keyPathParameters.new_timeLockKeyMultiSignerAddress
+    const oldAdminAddress = keyPathParameters.timeLockKeySignerAddress // new_timeLockKeyMultiSignerAddress
     // for in changeAdminRoles
     for (let i = 0; i < changeAdminRoles.length; i++) {
         await genByRole(polygonRollupManagerAddress, outputJson, deployer, changeAdminRoles[i], oldAdminAddress, salt, timelockDelay)

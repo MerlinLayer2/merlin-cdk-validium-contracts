@@ -98,7 +98,7 @@ async function main() {
         if ((await rollupManagerContract.hasRole(role, adminAddress)) == true){
             console.log(changeAdminRoles[i],'old admin has role true',  adminAddress)
         }else{
-            console.log(changeAdminRoles[i],'new admin has role false',  adminAddress)
+            console.log(changeAdminRoles[i],'old admin has role false',  adminAddress)
         }
         if ((await rollupManagerContract.hasRole(role, newAdminAddress)) == true){
             console.log(changeAdminRoles[i],'new admin has role true',  newAdminAddress)

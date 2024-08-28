@@ -116,6 +116,11 @@ async function setTrustedSequencer(wallet: any, contractAddress: string, newTrus
         const transactionResponse = await buildMultiSigBody(wallet.connect(currentProvider), contractABI3, 'setTrustedSequencer',[newTrustedSequencer], contractAddress,  'submitTransaction', keyPathParameters.new_adminKeyMultiSignerAddress)
         let receipt = await transactionResponse.wait();
 
+        // const contract = new ethers.Contract(contractAddress, contractABI3, wallet.connect(currentProvider));
+        //
+        // const tx = await contract.setTrustedSequencer(newTrustedSequencer);
+        // const receipt = await tx.wait();
+
         // const tx = await contract.setTrustedSequencer(newTrustedSequencer);
         // const receipt = await tx.wait();
 
@@ -133,6 +138,11 @@ async function setTrustedSequencerURL(wallet: any, contractAddress: string, newT
 
         const transactionResponse = await buildMultiSigBody(wallet.connect(currentProvider), contractABI3, 'setTrustedSequencerURL',[newTrustedSequencerURL], contractAddress,  'submitTransaction', keyPathParameters.new_adminKeyMultiSignerAddress)
         let receipt = await transactionResponse.wait();
+
+        // const contract = new ethers.Contract(contractAddress, contractABI3, wallet.connect(currentProvider));
+        //
+        // const tx = await contract.setTrustedSequencerURL(newTrustedSequencerURL);
+        // const receipt = await tx.wait();
 
         // const tx = await contract.setTrustedSequencerURL(newTrustedSequencerURL);
         // const receipt = await tx.wait();
@@ -179,7 +189,7 @@ async function main() {
     console.log('polygonZkEVMAddress:', polygonZkEVMAddress,'begin to set to:', 'trustedSequencer:', parameters.trustedSequencer, 'trustedSequencerURL:', parameters.trustedSequencerURL)
     setTrustedSequencer(wallet, polygonZkEVMAddress, parameters.trustedSequencer)
     //sleep 2 seconds
-    await new Promise((resolve) => { setTimeout(resolve, 2000); });
+    await new Promise((resolve) => { setTimeout(resolve, 4000); });
     setTrustedSequencerURL(wallet, polygonZkEVMAddress, parameters.trustedSequencerURL)
     //await new Promise((resolve) => { setTimeout(resolve, 2000); });
     console.log('==========================set done query new trusted sequencer and url==========================')

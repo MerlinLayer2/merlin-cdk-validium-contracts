@@ -31,10 +31,15 @@ const contractABI = [{
 
 async function transferOwnership(wallet: any, contractAddress: string, newOwner: string) {
     try {
-        const contract = new ethers.Contract(contractAddress, contractABI, wallet);
+        // const contract = new ethers.Contract(contractAddress, contractABI, wallet);
+        //
+        // const tx = await contract.transferOwnership(newOwner);
+        // const receipt = await tx.wait();
+        let currentProvider = ethers.provider;
+        //const contract = new ethers.Contract(contractAddress, contractABI3, wallet.connect(currentProvider));
 
-        const tx = await contract.transferOwnership(newOwner);
-        const receipt = await tx.wait();
+        const transactionResponse = await buildMultiSigBody(wallet.connect(currentProvider), contractABI, 'transferOwnership',[newOwner], contractAddress,  'submitTransaction', keyPathParameters.new_deployParameterMultiSignerAddress)
+        let receipt = await transactionResponse.wait();
 
         console.log('Ownership transfer transaction: to newOwner', newOwner, receipt);
     } catch (error) {
@@ -44,23 +49,23 @@ async function transferOwnership(wallet: any, contractAddress: string, newOwner:
 
 
 async function main() {
-    let deployerPath = keyPathParameters.deployParameterPath
+    let deployerPath = keyPathParameters.new_deployParameterPath
     //读deployerPath里面的私钥
     let currentProvider = ethers.provider;
     let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
     const wallet = new ethers.Wallet(privateKey)
 
     console.log('transferOwnership ')
-    let deployerMultiSignerAddr = keyPathParameters.new_deployParameterMultiSignerAddress
+    let newMultiSignerAddr = keyPathParameters.deployParameterAddress
 
     const dataCommitteeContractAddress = parameters.cdkDataCommitteeContract    //cdkDataCommittee
-    transferOwnership(wallet.connect(currentProvider), dataCommitteeContractAddress, deployerMultiSignerAddr)
+    transferOwnership(wallet.connect(currentProvider), dataCommitteeContractAddress, newMultiSignerAddr)
 
     //sleep 5second
     await new Promise(r => setTimeout(r, 5000));
 
     const cdkValidiumDeployerContract = parameters.cdkValidiumDeployerContract
-    transferOwnership(wallet.connect(currentProvider), cdkValidiumDeployerContract, deployerMultiSignerAddr)
+    transferOwnership(wallet.connect(currentProvider), cdkValidiumDeployerContract, newMultiSignerAddr)
 }
 
 main().catch((e) => {

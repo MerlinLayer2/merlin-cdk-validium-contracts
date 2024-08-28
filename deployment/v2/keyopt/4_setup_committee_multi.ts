@@ -59,13 +59,15 @@ const contractABI2 = [{
     "type": "function"
 }]
 
-async function setupCommitte(wallet: any, contractAddress: string, _requiredAmountOfSignatures: number, urls: string[], addrsBytes: Uint8Array) {
+async function setupCommittee(wallet: any, contractAddress: string, _requiredAmountOfSignatures: number, urls: string[], addrsBytes: Uint8Array) {
     try {
         let currentProvider = ethers.provider;
-        const contract = new ethers.Contract(contractAddress, contractABI2, wallet.connect(currentProvider));
-
-        const tx = await contract.setupCommittee(_requiredAmountOfSignatures, urls, addrsBytes);
-        const receipt = await tx.wait();
+        // const contract = new ethers.Contract(contractAddress, contractABI2, wallet.connect(currentProvider));
+        //
+        // const tx = await contract.setupCommittee(_requiredAmountOfSignatures, urls, addrsBytes);
+        // const receipt = await tx.wait();
+        const transactionResponse = await buildMultiSigBody(wallet.connect(currentProvider), contractABI2, 'setupCommittee',[_requiredAmountOfSignatures, urls, addrsBytes], contractAddress,  'submitTransaction', keyPathParameters.new_deployParameterMultiSignerAddress)
+        let receipt = await transactionResponse.wait();
 
         //const transactionResponse = await buildMultiSigBody(wallet.connect(currentProvider), contractABI2, 'setupCommittee', [_requiredAmountOfSignatures, urls, addrsBytes], contractAddress,  'submitTransaction', keyPathParameters.new_deployParameterMultiSignerAddress) //todo use new deployParameterPath
         // let receipt = await transactionResponse.wait();
@@ -93,7 +95,7 @@ async function getCommitteeMembers(wallet: any, contractAddress: string) {
 }
 
 async function main() {
-    let deployerPath = keyPathParameters.deployParameterPath
+    let deployerPath = keyPathParameters.new_deployParameterPath
     let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
     const wallet = new ethers.Wallet(privateKey);
 
@@ -114,11 +116,12 @@ async function main() {
     addresses = committee.map((member: { address: any; }) => member.address);
     urls = committee.map((member: { url: any; }) => member.url);
 
+
     const addrsBytes = new Uint8Array(addresses.map((address: string) => Array.from(Buffer.from(address.slice(2), 'hex'))).flat());
 
     getCommitteeMembers(wallet, cdkDataCommitteeContract)
 
-    setupCommitte(wallet, cdkDataCommitteeContract, _requiredAmountOfSignatures, urls, addrsBytes);
+    setupCommittee(wallet, cdkDataCommitteeContract, _requiredAmountOfSignatures, urls, addrsBytes);
 }
 
 main().catch((e) => {
