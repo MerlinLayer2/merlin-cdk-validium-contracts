@@ -29,7 +29,7 @@ async function main() {
     for (let i = 0; i < changeAdminRoles.length; i++) {
         const { executeData } = data[changeAdminRoles[i]];
         // eslint-disable-next-line no-await-in-loop
-        const transactionResponse = await buildMultiSigBodyWithBody(wallet, executeData, parameters.timelockAddress, 'submitTransaction', keyPathParameters.new_timeLockKeyMultiSignerAddress);
+        const transactionResponse = await buildMultiSigBodyWithBody(wallet, executeData, parameters.timelockAddress, 'submitTransaction', keyPathParameters.new_adminKeyMultiSignerAddress);
         // eslint-disable-next-line no-await-in-loop
         const receipt = await transactionResponse.wait();
         // eslint-disable-next-line no-console
