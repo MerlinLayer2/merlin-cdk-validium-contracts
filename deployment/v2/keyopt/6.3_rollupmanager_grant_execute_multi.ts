@@ -29,7 +29,7 @@ async function main() {
     for (let i = 0; i < changeAdminRoles.length; i++) {
         const { executeData } = data[changeAdminRoles[i]];
         // eslint-disable-next-line no-await-in-loop
-        const transactionResponse = await buildMultiSigBodyWithBody(wallet, executeData, parameters.timelockAddress, 'submitTransaction', keyPathParameters.new_adminKeyMultiSignerAddress);
+        const transactionResponse = await buildMultiSigBodyWithBody(wallet, executeData, parameters.timelockAddress, 'submitTransaction', keyPathParameters.new_timeLockKeyMultiSignerAddress);
         // eslint-disable-next-line no-await-in-loop
         const receipt = await transactionResponse.wait();
         // eslint-disable-next-line no-console
@@ -49,7 +49,7 @@ async function main() {
     for (let i = 0; i < changeValidiumRoles.length; i++) {
         const { executeData } = data[changeValidiumRoles[i]];
         // eslint-disable-next-line no-await-in-loop
-        const transactionResponse = await buildMultiSigBodyWithBody(wallet, executeData, parameters.timelockAddress, 'submitTransaction', keyPathParameters.new_cdkValidiumOwnerKeyMultiSignerAddress);
+        const transactionResponse = await buildMultiSigBodyWithBody(wallet, executeData, parameters.timelockAddress, 'submitTransaction', keyPathParameters.new_timeLockKeyMultiSignerAddress);
         // eslint-disable-next-line no-await-in-loop
         const receipt = await transactionResponse.wait();
         // eslint-disable-next-line no-console
