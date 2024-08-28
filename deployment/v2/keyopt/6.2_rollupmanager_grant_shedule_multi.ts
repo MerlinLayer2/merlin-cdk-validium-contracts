@@ -52,7 +52,7 @@ async function main() {
     for (let i = 0; i < changeValidiumRoles.length; i++) {
         const { scheduleData } = data[changeValidiumRoles[i]];
         // eslint-disable-next-line no-await-in-loop
-        const transactionResponse = await buildMultiSigBodyWithBody(wallet, scheduleData, parameters.timelockAddress, 'submitTransaction', keyPathParameters.new_timeLockKeyMultiSignerAddress);
+        const transactionResponse = await buildMultiSigBodyWithBody(wallet, scheduleData, parameters.timelockAddress, 'submitTransaction', keyPathParameters.new_deployParameterMultiSignerAddress);
         // eslint-disable-next-line no-await-in-loop
         const receipt = await transactionResponse.wait();
         // eslint-disable-next-line no-console
