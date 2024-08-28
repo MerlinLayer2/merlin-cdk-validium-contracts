@@ -11,10 +11,10 @@ async function main() {
     // 提取 scheduleData 和 executeData
 
     const changeAdminRoles = [
+        'CANCELLER_ROLE',
         'TIMELOCK_ADMIN_ROLE',
         'PROPOSER_ROLE',
         'EXECUTOR_ROLE',
-        'CANCELLER_ROLE',
     ];
     const currentProvider = ethers.provider;
 

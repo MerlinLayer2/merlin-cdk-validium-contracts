@@ -14,7 +14,7 @@ const pathOutputJson = path.join(__dirname, "./revokeRoleOutput2.json");
 async function main() {
     const outputJson = {} as any;
 
-    const {polygonRollupManagerAddress, timelockDelay} = parameters;
+    const {timelockAddress, timelockDelay} = parameters;
     const salt = parameters.timelockSalt || ethers.ZeroHash;
 
     const changeAdminRoles = [
@@ -32,7 +32,7 @@ async function main() {
     const oldAdminAddress = keyPathParameters.timeLockKeySignerAddress // new_timeLockKeyMultiSignerAddress
     // for in changeAdminRoles
     for (let i = 0; i < changeAdminRoles.length; i++) {
-        await genByRole(polygonRollupManagerAddress, outputJson, deployer, changeAdminRoles[i], oldAdminAddress, salt, timelockDelay)
+        await genByRole(timelockAddress, outputJson, deployer, changeAdminRoles[i], oldAdminAddress, salt, timelockDelay)
     }
 
     console.log(outputJson)
@@ -44,13 +44,13 @@ main().catch((e) => {
     process.exit(1);
 });
 
-async function genByRole(polygonRollupManagerAddress:string, outputJson: any,wallet: any, roleName: string, accountToRevokeRole: string,salt: any,timelockDelay: any) {
+async function genByRole(timelockAddress:string, outputJson: any,wallet: any, roleName: string, accountToRevokeRole: string,salt: any,timelockDelay: any) {
     const roleID = ethers.id(roleName);
     const timelockContractFactory = await ethers.getContractFactory("PolygonZkEVMTimelock", wallet);
 
 
     const operation = genOperation(
-        polygonRollupManagerAddress,
+        timelockAddress,
         0, // value
         timelockContractFactory.interface.encodeFunctionData("revokeRole", [roleID, accountToRevokeRole]),
         ethers.ZeroHash, // predecesoor
