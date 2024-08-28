@@ -20,6 +20,7 @@ async function main() {
     ];
     const changeValidiumRoles = [
         'EMERGENCY_COUNCIL_ADMIN',
+        'EMERGENCY_COUNCIL_ROLE',
     ];
 
     const currentProvider = ethers.provider;

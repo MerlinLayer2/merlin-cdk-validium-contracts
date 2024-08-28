@@ -83,6 +83,7 @@ async function main() {
     ];
     const changeValidiumRoles = [
         "EMERGENCY_COUNCIL_ADMIN", //使用 cdkValidiumOwner.privatekey
+        "EMERGENCY_COUNCIL_ROLE"
     ]
     const timelockAdminRoles = [
         "TIMELOCK_ADMIN_ROLE",
@@ -141,6 +142,23 @@ async function main() {
             console.log(timelockAdminRoles[i],'new admin has role false',  newTimeLockAdmin)
         }
     }
+    // console.log('=======================4 default admin role============================')
+    // const rl = '0x00'
+    // if ((await timelockContract.hasRole(rl, adminAddress)) == true){
+    //     console.log(rl,'old admin has role true',  adminAddress)
+    // }else{
+    //     console.log(rl,'old admin has role false',  adminAddress)
+    // }
+    // if ((await timelockContract.hasRole(rl, timelockAddress)) == true){
+    //     console.log(rl,'new admin has role true',  timelockAddress)
+    // }else{
+    //     console.log(rl,'new admin has role false',  timelockAddress)
+    // }
+    // if ((await timelockContract.hasRole(rl, newTimeLockAdmin)) == true){
+    //     console.log(rl,'new admin has role true',  newTimeLockAdmin)
+    // }else{
+    //     console.log(rl,'new admin has role false',  newTimeLockAdmin)
+    // }
 }
 
 main().catch((e) => {
