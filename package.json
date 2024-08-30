@@ -139,6 +139,7 @@
     "keyopt:rollupmanager_revoke_execute": "npx hardhat run deployment/v2/keyopt/7.3_rollupmanager_revoke_execute.ts --network remotehost",
     "keyopt:rollupmanager_revoke_shedule_multi": "npx hardhat run deployment/v2/keyopt/7.2_rollupmanager_revoke_shedule_multi.ts --network remotehost",
     "keyopt:rollupmanager_revoke_execute_multi": "npx hardhat run deployment/v2/keyopt/7.3_rollupmanager_revoke_execute_multi.ts --network remotehost",
+    "keyopt:rollupmanager_emergency_role": "npx hardhat run deployment/v2/keyopt/6.4_rollupmanager_grant_emergency.ts --network remotehost",
     "keyopt:timelock_grant_gentx": "npx hardhat run deployment/v2/keyopt/8.1_timelock_grant_gentx.ts --network remotehost",
     "keyopt:timelock_grant_shedule": "npx hardhat run deployment/v2/keyopt/8.2_timelock_grant_shedule.ts --network remotehost",
     "keyopt:timelock_grant_execute": "npx hardhat run deployment/v2/keyopt/8.3_timelock_grant_execute.ts --network remotehost",

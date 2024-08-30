@@ -20,7 +20,6 @@ async function main() {
     ];
     const changeValidiumRoles = [
         'EMERGENCY_COUNCIL_ADMIN', // 使用 cdkValidiumOwner.privatekey
-        'EMERGENCY_COUNCIL_ROLE',
     ];
 
     const currentProvider = ethers.provider;
