@@ -155,6 +155,7 @@ async function main() {
         throw new Error("zkEVM deployer contract is not deployed");
     }
     expect(deployer.address).to.be.equal(await zkEVMDeployerContract.owner());
+    console.log("zkEVMDeployerContract deployed to:", deployer.address);
 
     /*
      * Deploy Bridge

@@ -1,0 +1,36 @@
+{
+  "polygonRollupManagerAddress": "0xAefb2f4db0766F0D76c47d0dbc0A712D653cace6",
+  "timelockAddress": "0x4C313EcE0c79B6CA89B1F85A8b5D89a59D6fcCeB",
+  "polygonZkEVMAddress": "0x8173da1A9d41287158E9b6E38Ca9CDabBAE6bb6B",
+  "cdkDataCommitteeContract": "0xC2B6bE3E2D867F199E056e8741D94949CB864ad2",
+  "cdkValidiumDeployerContract": "0x67c47bF785A538a96eF513507FbF6692170a9CB2",
+  "trustedSequencer": "0xE3Db5e3cfDbBa56FfdDED5792DaAB8A2DC9c52c4",
+  "trustedSequencerURL": "https://new-sequencer",
+  "committeeAddr": [
+    "0x8dAF17A20c9DBA35f005b6324F493785D239719d",
+    "0x8dAF17A20c9DBA35f005b6324F493785D239719d",
+    "0x8dAF17A20c9DBA35f005b6324F493785D239719d",
+    "0x8dAF17A20c9DBA35f005b6324F493785D239719d",
+    "0x8dAF17A20c9DBA35f005b6324F493785D239719d"
+  ],
+  "committeeUrl": [
+    "https://da-node-01",
+    "https://da-node-02",
+    "https://da-node-03",
+    "https://da-node-04",
+    "https://da-node-05"
+  ],
+  "committeeThreshold": 3,
+  "timelockDelay": 1
+}
+
+
+
+
+"polygonValidiumEtrogAddress": "0x8173da1A9d41287158E9b6E38Ca9CDabBAE6bb6B"
+
+"polygonRollupManagerAddress": "0xAefb2f4db0766F0D76c47d0dbc0A712D653cace6"
+
+"timelockContractAddress": "0x4C313EcE0c79B6CA89B1F85A8b5D89a59D6fcCeB"
+
+"cdkDataCommitteeContract": "0xC2B6bE3E2D867F199E056e8741D94949CB864ad2"
