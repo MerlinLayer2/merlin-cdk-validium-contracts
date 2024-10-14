@@ -35,7 +35,7 @@ async function buildMultiSigBodyWithBody1(wallet: any){
     //获取rollup type id
     const contract = new ethers.Contract(fork9configPath.polygonRollupManagerAddress, rollupManagerQueryABI, wallet);
     const rollupData = await contract.rollupIDToRollupData(1);
-    let rollupTypeID = rollupData[10]+1
+    let rollupTypeID = Number(rollupData[10]) + 1
     console.log("please confirm rollup type id is", rollupTypeID);
 
     console.log(rollupData);
