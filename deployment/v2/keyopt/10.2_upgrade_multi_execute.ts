@@ -53,7 +53,7 @@ async function buildMultiSigBodyWithBody1(wallet: any){
     const timeLockData = contractInterface2.encodeFunctionData(
         "execute",
         [
-            "0xAefb2f4db0766F0D76c47d0dbc0A712D653cace6", 0, addRollupData, ethers.ZeroHash, fork9configPath.salt
+            fork9configPath.polygonRollupManagerAddress, 0, addRollupData, ethers.ZeroHash, fork9configPath.salt
         ]
     );
 
