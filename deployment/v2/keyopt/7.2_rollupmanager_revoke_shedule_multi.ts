@@ -1,0 +1,56 @@
+import fs from 'fs';
+import {ethers} from "hardhat";
+
+import keyPathParameters from "./key_path.json";
+import {buildMultiSigBodyWithBody} from "./utils";
+
+const data = require('./revokeRoleOutput.json');
+const parameters = require('./parameters.json');
+
+async function main() {
+    const { timelockAddress } = parameters;
+    // 提取 scheduleData 和 executeData
+
+    const changeAdminRoles = [
+        // admin privatekey
+        'OBSOLETE_ROLLUP_TYPE_ROLE',
+        'CREATE_ROLLUP_ROLE',
+        'STOP_EMERGENCY_ROLE',
+        'TWEAK_PARAMETERS_ROLE',
+        'SET_FEE_ROLE',
+        'TRUSTED_AGGREGATOR_ROLE_ADMIN',
+    ];
+    const changeValidiumRoles = [
+        'EMERGENCY_COUNCIL_ADMIN',
+    ];
+
+    const currentProvider = ethers.provider;
+    const deployerPath = keyPathParameters.new_timeLockKeyPath;
+    const privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
+    const wallet = new ethers.Wallet(privateKey).connect(currentProvider);
+
+    for (let i = 0; i < changeAdminRoles.length; i++) {
+        const { scheduleData } = data[changeAdminRoles[i]];
+        // eslint-disable-next-line no-await-in-loop
+        const transactionResponse = await buildMultiSigBodyWithBody(wallet, scheduleData, parameters.timelockAddress, 'submitTransaction', keyPathParameters.new_timeLockKeyMultiSignerAddress);
+        // eslint-disable-next-line no-await-in-loop
+        const receipt = await transactionResponse.wait();
+        // eslint-disable-next-line no-console
+        console.log(receipt);
+    }
+
+    for (let i = 0; i < changeValidiumRoles.length; i++) {
+        const { scheduleData } = data[changeValidiumRoles[i]];
+        // eslint-disable-next-line no-await-in-loop
+        const transactionResponse = await buildMultiSigBodyWithBody(wallet, scheduleData, parameters.timelockAddress, 'submitTransaction', keyPathParameters.new_timeLockKeyMultiSignerAddress);
+        // eslint-disable-next-line no-await-in-loop
+        const receipt = await transactionResponse.wait();
+        // eslint-disable-next-line no-console
+        console.log(receipt);
+    }
+}
+
+main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+});

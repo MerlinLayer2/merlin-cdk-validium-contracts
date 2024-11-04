@@ -1,0 +1,18 @@
+{
+  "l1_rpc": "",
+  "multi_timelock": "0xE42cAF6F8d9f8B2F2Fc189789E3b58c8E5187547",
+  "multi_admin":  "0x74c4A7265Ac6B8a8AD3Ab99071B63c007616Fb33",
+  "multi_emergency":  "0x9aa4726Caee03b311A33ABCD7BF3c441b76c2e11",
+  "multi_deployer":  "0x23B4B7663C7AAf7b5322280471866F40C6234B58",
+  "polygonZkEVMGlobalExitRootAddress": "0x07eb659bd996Ac74c154dfe86Ea875570647961C",
+  "polTokenAddress": "0xCC1975Bd1a1A2740ea47f9090f84755817049D94",
+  "polygonZkEVMBridgeProxy": "0xCa122881173F773A5d2DF68c2917D906ebb7133A",
+  "polygonRollupManagerAddress": "0xAefb2f4db0766F0D76c47d0dbc0A712D653cace6",
+  "polygonZkevmAddress": "0x8173da1A9d41287158E9b6E38Ca9CDabBAE6bb6B",
+  "timelock_contract": "0x4C313EcE0c79B6CA89B1F85A8b5D89a59D6fcCeB",
+  "admin_path": "",
+  "timelock_path": "",
+  "genesis_root": "0x5183b7033f156589d9d1190ad08dd5aa2af3cd4197afa57afa0509e0c61b254d",
+  "timelock_delay": 3600,
+  "salt": "0x3000000000000000000000000000000000000000000000000000000000000001"
+}
