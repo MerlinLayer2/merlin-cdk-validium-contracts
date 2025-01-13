@@ -1,0 +1,15 @@
+{
+  "multi_timelock": "0xE42cAF6F8d9f8B2F2Fc189789E3b58c8E5187547",
+  "polygonRollupManagerAddress": "0xAefb2f4db0766F0D76c47d0dbc0A712D653cace6",
+  "polygonZkevmAddress": "0x8173da1A9d41287158E9b6E38Ca9CDabBAE6bb6B",
+  "timelock_contract": "0x4C313EcE0c79B6CA89B1F85A8b5D89a59D6fcCeB",
+  "polygonconsensusContract": "",
+  "timelock_path": "",
+  "admin_path": "",
+  "deployerPvtKey": "01705c1f808f55526907eb5b9b3a42275aac99122d80a6609298fc1d37dee321",
+  "genesis_root": "0x5183b7033f156589d9d1190ad08dd5aa2af3cd4197afa57afa0509e0c61b254d",
+  "timelock_delay": 3600,
+  "salt": "0x3000000000000000000000000000000000000000000000000000000000000001",
+  "newVerifier": "",
+  "forkid": 12
+}
