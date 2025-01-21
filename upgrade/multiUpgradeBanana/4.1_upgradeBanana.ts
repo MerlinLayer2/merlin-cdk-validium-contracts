@@ -21,7 +21,7 @@ async function main() {
      * Check upgrade parameters
      * Check that every necessary parameter is fullfilled
      */
-    const mandatoryUpgradeParameters = ["rollupManagerAddress", "timelockDelay"];
+    const mandatoryUpgradeParameters = ["polygonRollupManagerAddress", "timelock_delay"];
 
     for (const parameterName of mandatoryUpgradeParameters) {
         if (upgradeParameters[parameterName] === undefined || upgradeParameters[parameterName] === "") {
