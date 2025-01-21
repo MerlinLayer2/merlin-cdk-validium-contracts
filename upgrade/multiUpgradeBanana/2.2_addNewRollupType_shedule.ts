@@ -8,6 +8,8 @@ import {ethers as ethers2} from "ethers";
 dotenv.config({path: path.resolve(__dirname, "../../.env")});
 
 const fork12configPath = require("./merlin-upgrade-fork12.json")
+const consensusParameters = require("./new-consensus-out.json");
+
 // @ts-ignore
 const RollupABI = [{"inputs":[{"internalType":"address","name":"consensusImplementation","type":"address"},{"internalType":"contract IVerifierRollup","name":"verifier","type":"address"},{"internalType":"uint64","name":"forkID","type":"uint64"},{"internalType":"uint8","name":"rollupCompatibilityID","type":"uint8"},{"internalType":"bytes32","name":"genesis","type":"bytes32"},{"internalType":"string","name":"description","type":"string"}],"name":"addNewRollupType","outputs":[],"stateMutability":"nonpayable","type":"function"}]
 const TimelockABI = [{"inputs":[{"internalType":"address","name":"target","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"bytes32","name":"predecessor","type":"bytes32"},{"internalType":"bytes32","name":"salt","type":"bytes32"},{"internalType":"uint256","name":"delay","type":"uint256"}],"name":"schedule","outputs":[],"stateMutability":"nonpayable","type":"function"}]
@@ -30,22 +32,33 @@ main().catch((e) => {
 
 
 async function buildMultiSigBodyWithBody(wallet: any){
-    console.log("!!!!",fork12configPath.polygonconsensusContract)
+    console.log("!!!!",consensusParameters.polygonConsensusContractAddress)
     if (
-        fork12configPath.polygonconsensusContract === undefined ||
-        fork12configPath.polygonconsensusContract === ""
+        consensusParameters.polygonConsensusContractAddress === undefined ||
+        consensusParameters.polygonConsensusContractAddress === ""
     ){
         console.log("polygonconsensusContract is empty, please input the polygonconsensusContract")
         throw new Error("polygonconsensusContract is empty, please input the polygonconsensusContract");
         return
     }
+
+    console.log("!!!! Verifier", fork12configPath.newVerifier)
+    if (
+        fork12configPath.newVerifier === undefined ||
+        fork12configPath.newVerifier === ""
+    ){
+        console.log("newVerifier is empty, please input the newVerifier")
+        throw new Error("newVerifier is empty, please input the newVerifier");
+        return
+    }
+
         // @ts-ignore
     const contractInterface1 = new ethers2.Interface(RollupABI);
     // @ts-ignore
     const addRollupData = contractInterface1.encodeFunctionData(
         "addNewRollupType",
         [
-            fork12configPath.polygonconsensusContract,
+            consensusParameters.polygonConsensusContractAddress,
             fork12configPath.newVerifier,
             fork12configPath.forkid,
             0, // rollupCompatibilityID

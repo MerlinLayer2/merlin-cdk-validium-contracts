@@ -43,51 +43,10 @@ async function main() {
 
     // Load provider
     let currentProvider = ethers.provider;
-    // if (upgradeParameters.multiplierGas || upgradeParameters.maxFeePerGas) {
-    //     if (process.env.HARDHAT_NETWORK !== "hardhat") {
-    //         currentProvider = ethers.getDefaultProvider(
-    //             `https://${process.env.HARDHAT_NETWORK}.infura.io/v3/${process.env.INFURA_PROJECT_ID}`
-    //         ) as any;
-    //         if (upgradeParameters.maxPriorityFeePerGas && upgradeParameters.maxFeePerGas) {
-    //             console.log(
-    //                 `Hardcoded gas used: MaxPriority${upgradeParameters.maxPriorityFeePerGas} gwei, MaxFee${upgradeParameters.maxFeePerGas} gwei`
-    //             );
-    //             const FEE_DATA = new ethers.FeeData(
-    //                 null,
-    //                 ethers.parseUnits(upgradeParameters.maxFeePerGas, "gwei"),
-    //                 ethers.parseUnits(upgradeParameters.maxPriorityFeePerGas, "gwei")
-    //             );
-    //
-    //             currentProvider.getFeeData = async () => FEE_DATA;
-    //         } else {
-    //             console.log("Multiplier gas used: ", upgradeParameters.multiplierGas);
-    //             async function overrideFeeData() {
-    //                 const feedata = await ethers.provider.getFeeData();
-    //                 return new ethers.FeeData(
-    //                     null,
-    //                     ((feedata.maxFeePerGas as bigint) * BigInt(upgradeParameters.multiplierGas)) / 1000n,
-    //                     ((feedata.maxPriorityFeePerGas as bigint) * BigInt(upgradeParameters.multiplierGas)) / 1000n
-    //                 );
-    //             }
-    //             currentProvider.getFeeData = overrideFeeData;
-    //         }
-    //     }
-    // }
-    //
-    // // Load deployer
-    // let deployer;
-    // if (upgradeParameters.deployerPvtKey) {
-    //     deployer = new ethers.Wallet(upgradeParameters.deployerPvtKey, currentProvider);
-    // } else if (process.env.MNEMONIC) {
-    //     deployer = ethers.HDNodeWallet.fromMnemonic(
-    //         ethers.Mnemonic.fromPhrase(process.env.MNEMONIC),
-    //         "m/44'/60'/0'/0/0"
-    //     ).connect(currentProvider);
-    // } else {
-    //     [deployer] = await ethers.getSigners();
-    // }
+    let deployerPath = upgradeParameters.admin_path
+    let privateKey = fs.readFileSync(deployerPath, 'utf-8').toString().trim();
 
-    let deployer = new ethers.Wallet(upgradeParameters.deployerPvtKey, currentProvider);
+    let deployer = new ethers.Wallet(privateKey, currentProvider);
 
     console.log("deploying with: ", deployer.address);
 

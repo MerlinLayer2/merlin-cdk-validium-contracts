@@ -36,7 +36,16 @@ main().catch((e) => {
 // OZ test function
 
 async function buildMultiSigBodyWithBody(wallet: any){
-    console.log("!!!!", pathUpgradeOutputJson.scheduleData)
+    console.log("!!!! scheduleData ", pathUpgradeOutputJson.scheduleData)
+
+    if (
+        pathUpgradeOutputJson.scheduleData === undefined ||
+        pathUpgradeOutputJson.scheduleData === ""
+    ){
+        console.log("scheduleData is empty, please input the scheduleData")
+        throw new Error("scheduleData is empty, please input the scheduleData");
+        return
+    }
 
     const contractInterface3 = new ethers2.Interface(MultiABI);
 

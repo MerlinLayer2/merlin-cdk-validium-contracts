@@ -8,7 +8,7 @@ import * as dotenv from "dotenv";
 dotenv.config({path: path.resolve(__dirname, "../../.env")});
 import {ethers, upgrades} from "hardhat";
 
-const fork12configPath = require("./merlin-upgrade-fork12.json")
+const fork12configPath = require("./merlin-upgrade-fork12.json");
 
 const pathOutputJson = path.join(__dirname, `./new-consensus-out.json`);
 
