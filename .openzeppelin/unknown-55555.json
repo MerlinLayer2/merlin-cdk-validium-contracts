@@ -1,0 +1,830 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x9ea2b4766D5af554053E7088149d7e5FF3dB5E07"
+  },
+  "proxies": [
+    {
+      "address": "0x07eb659bd996Ac74c154dfe86Ea875570647961C",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xAefb2f4db0766F0D76c47d0dbc0A712D653cace6",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "b715a9b7d4748ea242afcbbb6ba872d086c1d4021c2806a5486b7785edac1e5f": {
+      "address": "0x0718f636B61F1a5F611c94A3fF4EEEFCBf6ed03B",
+      "layout": {
+        "solcVersion": "0.8.20",
+        "storage": [
+          {
+            "label": "lastRollupExitRoot",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bytes32",
+            "contract": "PolygonZkEVMGlobalExitRootBaseStorage",
+            "src": "contracts/v2/lib/PolygonZkEVMGlobalExitRootBaseStorage.sol:14"
+          },
+          {
+            "label": "lastMainnetExitRoot",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_bytes32",
+            "contract": "PolygonZkEVMGlobalExitRootBaseStorage",
+            "src": "contracts/v2/lib/PolygonZkEVMGlobalExitRootBaseStorage.sol:17"
+          },
+          {
+            "label": "globalExitRootMap",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_bytes32,t_uint256)",
+            "contract": "PolygonZkEVMGlobalExitRootBaseStorage",
+            "src": "contracts/v2/lib/PolygonZkEVMGlobalExitRootBaseStorage.sol:21"
+          },
+          {
+            "label": "_branch",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_array(t_bytes32)32_storage",
+            "contract": "DepositContractBase",
+            "src": "contracts/v2/lib/DepositContractBase.sol:23"
+          },
+          {
+            "label": "depositCount",
+            "offset": 0,
+            "slot": "35",
+            "type": "t_uint256",
+            "contract": "DepositContractBase",
+            "src": "contracts/v2/lib/DepositContractBase.sol:26"
+          },
+          {
+            "label": "_gap",
+            "offset": 0,
+            "slot": "36",
+            "type": "t_array(t_uint256)10_storage",
+            "contract": "DepositContractBase",
+            "src": "contracts/v2/lib/DepositContractBase.sol:32"
+          }
+        ],
+        "types": {
+          "t_array(t_bytes32)32_storage": {
+            "label": "bytes32[32]",
+            "numberOfBytes": "1024"
+          },
+          "t_array(t_uint256)10_storage": {
+            "label": "uint256[10]",
+            "numberOfBytes": "320"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "9ae1e2097eb5d679549fadd063e31a60d9238db2b061c9123118b6d296579de5": {
+      "address": "0x7E41Ef5Bbb2ccF121f789340545fE59d32d2ee7D",
+      "layout": {
+        "solcVersion": "0.8.20",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_legacyOwner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "PolygonAccessControlUpgradeable",
+            "src": "contracts/v2/lib/PolygonAccessControlUpgradeable.sol:29",
+            "renamedFrom": "_owner"
+          },
+          {
+            "label": "_roles",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)7469_storage)",
+            "contract": "PolygonAccessControlUpgradeable",
+            "src": "contracts/v2/lib/PolygonAccessControlUpgradeable.sol:36"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "53",
+            "type": "t_array(t_uint256)48_storage",
+            "contract": "PolygonAccessControlUpgradeable",
+            "src": "contracts/v2/lib/PolygonAccessControlUpgradeable.sol:244"
+          },
+          {
+            "label": "_gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)10_storage",
+            "contract": "EmergencyManager",
+            "src": "contracts/lib/EmergencyManager.sol:23"
+          },
+          {
+            "label": "isEmergencyState",
+            "offset": 0,
+            "slot": "111",
+            "type": "t_bool",
+            "contract": "EmergencyManager",
+            "src": "contracts/lib/EmergencyManager.sol:26"
+          },
+          {
+            "label": "_legacyVerifyBatchTimeTarget",
+            "offset": 1,
+            "slot": "111",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:45",
+            "renamedFrom": "verifyBatchTimeTarget"
+          },
+          {
+            "label": "_legacyMultiplierBatchFee",
+            "offset": 9,
+            "slot": "111",
+            "type": "t_uint16",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:49",
+            "renamedFrom": "multiplierBatchFee"
+          },
+          {
+            "label": "_legacyTrustedSequencer",
+            "offset": 11,
+            "slot": "111",
+            "type": "t_address",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:53",
+            "renamedFrom": "trustedSequencer"
+          },
+          {
+            "label": "_legacyBatchFee",
+            "offset": 0,
+            "slot": "112",
+            "type": "t_uint256",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:57",
+            "renamedFrom": "batchFee"
+          },
+          {
+            "label": "_legacyForcedBatches",
+            "offset": 0,
+            "slot": "113",
+            "type": "t_mapping(t_uint64,t_bytes32)",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:64",
+            "renamedFrom": "forcedBatches"
+          },
+          {
+            "label": "_legacySequencedBatches",
+            "offset": 0,
+            "slot": "114",
+            "type": "t_mapping(t_uint64,t_struct(SequencedBatchData)7340_storage)",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:69",
+            "renamedFrom": "sequencedBatches"
+          },
+          {
+            "label": "_legacyLastTimestamp",
+            "offset": 0,
+            "slot": "115",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:73",
+            "renamedFrom": "lastTimestamp"
+          },
+          {
+            "label": "_legacylastBatchSequenced",
+            "offset": 8,
+            "slot": "115",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:77",
+            "renamedFrom": "lastBatchSequenced"
+          },
+          {
+            "label": "_legacyLastForceBatchSequenced",
+            "offset": 16,
+            "slot": "115",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:81",
+            "renamedFrom": "lastForceBatchSequenced"
+          },
+          {
+            "label": "_legacyLastForceBatch",
+            "offset": 24,
+            "slot": "115",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:85",
+            "renamedFrom": "lastForceBatch"
+          },
+          {
+            "label": "_legacyLastVerifiedBatch",
+            "offset": 0,
+            "slot": "116",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:89",
+            "renamedFrom": "lastVerifiedBatch"
+          },
+          {
+            "label": "_legacyTrustedAggregator",
+            "offset": 8,
+            "slot": "116",
+            "type": "t_address",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:93",
+            "renamedFrom": "trustedAggregator"
+          },
+          {
+            "label": "_legacyBatchNumToStateRoot",
+            "offset": 0,
+            "slot": "117",
+            "type": "t_mapping(t_uint64,t_bytes32)",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:98",
+            "renamedFrom": "batchNumToStateRoot"
+          },
+          {
+            "label": "_legacyTrustedSequencerURL",
+            "offset": 0,
+            "slot": "118",
+            "type": "t_string_storage",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:102",
+            "renamedFrom": "trustedSequencerURL"
+          },
+          {
+            "label": "_legacyNetworkName",
+            "offset": 0,
+            "slot": "119",
+            "type": "t_string_storage",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:106",
+            "renamedFrom": "networkName"
+          },
+          {
+            "label": "_legacyPendingStateTransitions",
+            "offset": 0,
+            "slot": "120",
+            "type": "t_mapping(t_uint256,t_struct(PendingState)7350_storage)",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:111",
+            "renamedFrom": "pendingStateTransitions"
+          },
+          {
+            "label": "_legacyLastPendingState",
+            "offset": 0,
+            "slot": "121",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:115",
+            "renamedFrom": "lastPendingState"
+          },
+          {
+            "label": "_legacyLastPendingStateConsolidated",
+            "offset": 8,
+            "slot": "121",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:119",
+            "renamedFrom": "lastPendingStateConsolidated"
+          },
+          {
+            "label": "_legacyPendingStateTimeout",
+            "offset": 16,
+            "slot": "121",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:123",
+            "renamedFrom": "pendingStateTimeout"
+          },
+          {
+            "label": "_legacyTrustedAggregatorTimeout",
+            "offset": 24,
+            "slot": "121",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:128",
+            "renamedFrom": "trustedAggregatorTimeout"
+          },
+          {
+            "label": "_legacyAdmin",
+            "offset": 0,
+            "slot": "122",
+            "type": "t_address",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:132",
+            "renamedFrom": "admin"
+          },
+          {
+            "label": "_legacyPendingAdmin",
+            "offset": 0,
+            "slot": "123",
+            "type": "t_address",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:136",
+            "renamedFrom": "pendingAdmin"
+          },
+          {
+            "label": "_legacyForceBatchTimeout",
+            "offset": 20,
+            "slot": "123",
+            "type": "t_uint64",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:140",
+            "renamedFrom": "forceBatchTimeout"
+          },
+          {
+            "label": "_legacyIsForcedBatchDisallowed",
+            "offset": 28,
+            "slot": "123",
+            "type": "t_bool",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:144",
+            "renamedFrom": "isForcedBatchDisallowed"
+          },
+          {
+            "label": "_legacyVersion",
+            "offset": 0,
+            "slot": "124",
+            "type": "t_uint256",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:148",
+            "renamedFrom": "version"
+          },
+          {
+            "label": "_legacyLastVerifiedBatchBeforeUpgrade",
+            "offset": 0,
+            "slot": "125",
+            "type": "t_uint256",
+            "contract": "LegacyZKEVMStateVariables",
+            "src": "contracts/v2/lib/LegacyZKEVMStateVariables.sol:152",
+            "renamedFrom": "lastVerifiedBatchBeforeUpgrade"
+          },
+          {
+            "label": "rollupTypeCount",
+            "offset": 0,
+            "slot": "126",
+            "type": "t_uint32",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:170"
+          },
+          {
+            "label": "rollupTypeMap",
+            "offset": 0,
+            "slot": "127",
+            "type": "t_mapping(t_uint32,t_struct(RollupType)3613_storage)",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:173"
+          },
+          {
+            "label": "rollupCount",
+            "offset": 0,
+            "slot": "128",
+            "type": "t_uint32",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:176"
+          },
+          {
+            "label": "rollupIDToRollupData",
+            "offset": 0,
+            "slot": "129",
+            "type": "t_mapping(t_uint32,t_struct(RollupData)3655_storage)",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:179"
+          },
+          {
+            "label": "rollupAddressToID",
+            "offset": 0,
+            "slot": "130",
+            "type": "t_mapping(t_address,t_uint32)",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:182"
+          },
+          {
+            "label": "chainIDToRollupID",
+            "offset": 0,
+            "slot": "131",
+            "type": "t_mapping(t_uint64,t_uint32)",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:186"
+          },
+          {
+            "label": "totalSequencedBatches",
+            "offset": 0,
+            "slot": "132",
+            "type": "t_uint64",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:189"
+          },
+          {
+            "label": "totalVerifiedBatches",
+            "offset": 8,
+            "slot": "132",
+            "type": "t_uint64",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:192"
+          },
+          {
+            "label": "lastAggregationTimestamp",
+            "offset": 16,
+            "slot": "132",
+            "type": "t_uint64",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:195"
+          },
+          {
+            "label": "trustedAggregatorTimeout",
+            "offset": 24,
+            "slot": "132",
+            "type": "t_uint64",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:199"
+          },
+          {
+            "label": "pendingStateTimeout",
+            "offset": 0,
+            "slot": "133",
+            "type": "t_uint64",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:202"
+          },
+          {
+            "label": "verifyBatchTimeTarget",
+            "offset": 8,
+            "slot": "133",
+            "type": "t_uint64",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:206"
+          },
+          {
+            "label": "multiplierBatchFee",
+            "offset": 16,
+            "slot": "133",
+            "type": "t_uint16",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:209"
+          },
+          {
+            "label": "_batchFee",
+            "offset": 0,
+            "slot": "134",
+            "type": "t_uint256",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:213"
+          },
+          {
+            "label": "lastDeactivatedEmergencyStateTimestamp",
+            "offset": 0,
+            "slot": "135",
+            "type": "t_uint64",
+            "contract": "PolygonRollupManager",
+            "src": "contracts/v2/PolygonRollupManager.sol:216"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)10_storage": {
+            "label": "uint256[10]",
+            "numberOfBytes": "320"
+          },
+          "t_array(t_uint256)48_storage": {
+            "label": "uint256[48]",
+            "numberOfBytes": "1536"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IPolygonRollupBase)6982": {
+            "label": "contract IPolygonRollupBase",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVerifierRollup)3495": {
+            "label": "contract IVerifierRollup",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint32)": {
+            "label": "mapping(address => uint32)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)7469_storage)": {
+            "label": "mapping(bytes32 => struct PolygonAccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(PendingState)7350_storage)": {
+            "label": "mapping(uint256 => struct LegacyZKEVMStateVariables.PendingState)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint32,t_struct(RollupData)3655_storage)": {
+            "label": "mapping(uint32 => struct PolygonRollupManager.RollupData)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint32,t_struct(RollupType)3613_storage)": {
+            "label": "mapping(uint32 => struct PolygonRollupManager.RollupType)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint64,t_bytes32)": {
+            "label": "mapping(uint64 => bytes32)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint64,t_struct(SequencedBatchData)7340_storage)": {
+            "label": "mapping(uint64 => struct LegacyZKEVMStateVariables.SequencedBatchData)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint64,t_uint32)": {
+            "label": "mapping(uint64 => uint32)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(PendingState)7350_storage": {
+            "label": "struct LegacyZKEVMStateVariables.PendingState",
+            "members": [
+              {
+                "label": "timestamp",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "lastVerifiedBatch",
+                "type": "t_uint64",
+                "offset": 8,
+                "slot": "0"
+              },
+              {
+                "label": "exitRoot",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "stateRoot",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(RoleData)7469_storage": {
+            "label": "struct PolygonAccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(RollupData)3655_storage": {
+            "label": "struct PolygonRollupManager.RollupData",
+            "members": [
+              {
+                "label": "rollupContract",
+                "type": "t_contract(IPolygonRollupBase)6982",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "chainID",
+                "type": "t_uint64",
+                "offset": 20,
+                "slot": "0"
+              },
+              {
+                "label": "verifier",
+                "type": "t_contract(IVerifierRollup)3495",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "forkID",
+                "type": "t_uint64",
+                "offset": 20,
+                "slot": "1"
+              },
+              {
+                "label": "batchNumToStateRoot",
+                "type": "t_mapping(t_uint64,t_bytes32)",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "sequencedBatches",
+                "type": "t_mapping(t_uint64,t_struct(SequencedBatchData)7340_storage)",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "pendingStateTransitions",
+                "type": "t_mapping(t_uint256,t_struct(PendingState)7350_storage)",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "lastLocalExitRoot",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "lastBatchSequenced",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "lastVerifiedBatch",
+                "type": "t_uint64",
+                "offset": 8,
+                "slot": "6"
+              },
+              {
+                "label": "lastPendingState",
+                "type": "t_uint64",
+                "offset": 16,
+                "slot": "6"
+              },
+              {
+                "label": "lastPendingStateConsolidated",
+                "type": "t_uint64",
+                "offset": 24,
+                "slot": "6"
+              },
+              {
+                "label": "lastVerifiedBatchBeforeUpgrade",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "rollupTypeID",
+                "type": "t_uint64",
+                "offset": 8,
+                "slot": "7"
+              },
+              {
+                "label": "rollupCompatibilityID",
+                "type": "t_uint8",
+                "offset": 16,
+                "slot": "7"
+              }
+            ],
+            "numberOfBytes": "256"
+          },
+          "t_struct(RollupType)3613_storage": {
+            "label": "struct PolygonRollupManager.RollupType",
+            "members": [
+              {
+                "label": "consensusImplementation",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "verifier",
+                "type": "t_contract(IVerifierRollup)3495",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "forkID",
+                "type": "t_uint64",
+                "offset": 20,
+                "slot": "1"
+              },
+              {
+                "label": "rollupCompatibilityID",
+                "type": "t_uint8",
+                "offset": 28,
+                "slot": "1"
+              },
+              {
+                "label": "obsolete",
+                "type": "t_bool",
+                "offset": 29,
+                "slot": "1"
+              },
+              {
+                "label": "genesis",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(SequencedBatchData)7340_storage": {
+            "label": "struct LegacyZKEVMStateVariables.SequencedBatchData",
+            "members": [
+              {
+                "label": "accInputHash",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "sequencedTimestamp",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "previousLastBatchSequenced",
+                "type": "t_uint64",
+                "offset": 8,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint16": {
+            "label": "uint16",
+            "numberOfBytes": "2"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint32": {
+            "label": "uint32",
+            "numberOfBytes": "4"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    }
+  }
+}
