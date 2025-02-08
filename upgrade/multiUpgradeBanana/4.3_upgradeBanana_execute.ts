@@ -62,7 +62,7 @@ async function buildMultiSigBodyWithBody(wallet: any){
         to: fork12onfigPath.multi_timelock,
         data: multiTimelockData,
         value: 0,
-        gasLimit: 500000,
+        gasLimit: 5000000,
         gasPrice: ethers2.parseUnits('10', 'gwei'),
     })
     console.log(r,wallet.address)
