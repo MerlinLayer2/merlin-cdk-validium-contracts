@@ -32,7 +32,7 @@ main().catch((e) => {
 });
 
 
-async function buildMultiSigBodyWithBody1(wallet: any){
+async function buildMultiSigBodyWithBody(wallet: any){
     console.log("!!!! ConsensusContract ",consensusParameters.polygonConsensusContractAddress)
     if (
         consensusParameters.polygonConsensusContractAddress === undefined ||
