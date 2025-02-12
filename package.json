@@ -118,6 +118,9 @@
         "multi:updateRollup::execute_tx": "npx hardhat run upgrade/multiUpgradeBanana/3.2_updateRollup_execute.ts --network remotehost",
         "multi:upgradeBanana": "npx hardhat run upgrade/multiUpgradeBanana/4.1_upgradeBanana.ts --network remotehost",
         "multi:upgradeBanana::shedule_tx": "npx hardhat run upgrade/multiUpgradeBanana/4.2_upgradeBanana_shedule.ts --network remotehost",
-        "multi:upgradeBanana::execute_tx": "npx hardhat run upgrade/multiUpgradeBanana/4.3_upgradeBanana_execute.ts --network remotehost"
+        "multi:upgradeBanana::execute_tx": "npx hardhat run upgrade/multiUpgradeBanana/4.3_upgradeBanana_execute.ts --network remotehost",
+        "multi:query::rollupType": "npx hardhat run upgrade/multiUpgradeBanana/2_queryRollupType.ts --network remotehost",
+        "multi:query::rollupData": "npx hardhat run upgrade/multiUpgradeBanana/3_queryRollupData.ts --network remotehost",
+        "multi:query::banana": "npx hardhat run upgrade/multiUpgradeBanana/4_queryBanana.ts --network remotehost"
     }
 }
