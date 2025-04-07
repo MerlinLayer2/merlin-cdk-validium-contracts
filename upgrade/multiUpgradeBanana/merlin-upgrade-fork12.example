@@ -7,6 +7,7 @@
   "admin_path": "",
   "genesis_root": "0xcc9ec17819f4ac7f282949ca8c379c4d3ee1b8b7908c51b9b405b6319af67b32",
   "timelock_delay": 3600,
+  "update_timelock_delay": 1,
   "salt": "0x3000000000000000000000000000000000000000000000000000000000000001",
   "newVerifier": "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F",
   "forkid": 12

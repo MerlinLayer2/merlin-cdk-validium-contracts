@@ -111,6 +111,8 @@
         "upgradev2:timelock:mainnet": "npx hardhat run upgrade/upgradeToV2/upgradeToV2.ts --network mainnet && npm run saveUpgradeV2:mainnet",
         "verify:upgradeV2:mainnet": "npx hardhat run upgrade/upgradeToV2/verifyContracts.ts --network mainnet",
         "saveUpgradeV2:mainnet": "mkdir -p upgrade/upgradeToV2/mainnet_$(date +%s) && cp -r upgrade/upgradeToV2/upgrade_*.json upgrade/upgradeToV2/mainnet_$(date +%s) && cp -r upgrade/upgradeToV2/deploy_*.json upgrade/upgradeToV2/mainnet_$(date +%s) && cp .openzeppelin/mainnet.json upgrade/upgradeToV2/mainnet_$(date +%s)",
+        "multi:updateDelay::shedule_tx": "npx hardhat run upgrade/multiUpgradeBanana/1.1_updateDelay_shedule.ts --network localhost",
+        "multi:updateDelay::execute_tx": "npx hardhat run upgrade/multiUpgradeBanana/1.2_updateDelay_execute.ts --network localhost",
         "multi:deployConsensusContract": "npx hardhat run upgrade/multiUpgradeBanana/2.1_deployConsensusContract.ts --network remotehost",
         "multi:addNewRollupType::shedule_tx": "npx hardhat run upgrade/multiUpgradeBanana/2.2_addNewRollupType_shedule.ts --network remotehost",
         "multi:addNewRollupType::execute_tx": "npx hardhat run upgrade/multiUpgradeBanana/2.3_addNewRollupType_execute.ts --network remotehost",
