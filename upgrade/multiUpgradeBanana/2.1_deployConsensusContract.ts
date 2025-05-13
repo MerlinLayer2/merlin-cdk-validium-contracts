@@ -23,8 +23,6 @@ async function main() {
     let polygonRollupManagerAddress = fork12configPath.polygonRollupManagerAddress
     let consensusContract =  "PolygonValidiumEtrog"
 
-    console.log("privateKey", privateKey)
-
     // Load provider
     let currentProvider = ethers.provider;
     // Load deployer
